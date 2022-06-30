@@ -14,7 +14,6 @@ class Command(BaseCommand):
         models.Ingredient.objects.all().delete()
         with open(f"{data}/ingredients.csv", "r") as table:
             reader = csv.DictReader(table)
-        # TODO: Дописать логику добавления и через csv файл в том числе.
         with open(f"{data}/ingredients.json", "r") as j:
             data_dict = json.loads(j.read())
             for a in tqdm(data_dict):
@@ -22,3 +21,6 @@ class Command(BaseCommand):
                     name=a.get("name"),
                     measurement=a.get("measurement_unit")
                 )
+"""
+@todo Сделать добавление по csv файлу в том числе.
+"""
