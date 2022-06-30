@@ -8,31 +8,36 @@ User = get_user_model()
 class Recipe(models.Model):
     author = models.ForeignKey(
         User,
-        help_text="Автор рецепта",
+        verbose_name="Автор рецепта",
         on_delete=models.CASCADE,
         blank=False
     )
     name = models.CharField(
-        help_text="Название рецепта",
+        verbose_name="Название рецепта",
+        help_text="Введите название рецепта",
         max_length=128,
         index=True,
         blank=False
     )
-    image = models.ImageField()
+    image = models.ImageField(
+        verbose_name="Картинка блюда",
+    )
     description = models.TextField(
-        help_text="Описание рецепта",
+        verbose_name="Описание рецепта",
+        help_text="Введите описание рецепта",
         blank=False
     )
     ingredient = models.ManyToManyField(
         "Ingredient",
-        help_text="Ингридиенты рецента",
+        verbose_name="Ингридиенты рецепта",
+        help_text="Выберите ингридиенты рецепта",
         related_name="reciepe_ingredient",
         blank=False
     )
     time = models.TimeField(
         help_text="Время приготовления"
     )
-    #tags = models.ManyToOneRel("Tags")
+    tags = models.ManyToOneRel("Tag")
 
     def __str__(self):
         return self.name
@@ -44,23 +49,25 @@ class Recipe(models.Model):
 
 
 
-
-class Tags(models.Model):
+class Tag(models.Model):
     name: str = models.CharField(
-        help_text="Имя тега",
+        verbose_name="Имя тега",
+        help_text="Введите имя тега",
         max_length=128,
         unique=True,
         index=True,
         blank=False
     )
     code: str = models.CharField(
-        help_text="Код цвета HEX",
+        verbose_name="Код цвета HEX",
+        help_text="Введите код цвета HEX",
         max_length=128,
         unique=True,
         blank=False
     )
     slug: str = models.SlugField(
-        help_text="slug поле Тега",
+        verbose_name="slug поле Тега",
+        help_text="Введите slug поле Тега",
         max_length=128,
         unique=True,
         index=True,
@@ -77,16 +84,27 @@ class Tags(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(
-        help_text="Название ингридиента",
+        verbose_name="Название ингредиента",
+        help_text="Введите название ингридиента",
         max_length=128,
         index=True,
         blank=False
     )
     quantity = models.IntegerField(
-        help_text="Количество ингридиента",
+        verbose_name="Количество ингридиента",
+        help_text="Введите количество ингридиента",
         blank=False
     )
     measurement = models.CharField(
-        max_length=15,
-        help_text="Единица измерения ингридиента"
+        verbose_name="Единица измерения ингридиента",
+        help_text="Введите единицу измерения",
+        max_length=15
     )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['-name']
+        verbose_name = 'Ингридиент'
+        verbose_name_plural = 'Ингридиенты'
