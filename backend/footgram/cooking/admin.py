@@ -1,9 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
 
 from .models import Recipe, Ingredient, Tag
-
-User = get_user_model()
 
 
 class RecipeAdmin(admin.ModelAdmin):
@@ -15,8 +12,6 @@ class RecipeAdmin(admin.ModelAdmin):
         "image",
         "time",
         "author",
-        "ingredient",
-        "tags",
     )
 
 
@@ -25,7 +20,8 @@ class TagAdmin(admin.ModelAdmin):
         "id",
         "name",
         "code",
-        "slug"
+        "slug",
+        "recipe"
     )
 
 
@@ -37,18 +33,6 @@ class IngredientAdmin(admin.ModelAdmin):
         "measurement"
     )
 
-
-class UserAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "username",
-        "password",
-        "is_active",
-        "last_login"
-    )
-
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
-admin.site.register(User, UserAdmin)
-

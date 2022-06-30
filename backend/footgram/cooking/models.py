@@ -10,13 +10,14 @@ class Recipe(models.Model):
         User,
         verbose_name="Автор рецепта",
         on_delete=models.CASCADE,
+        db_index=True,
         blank=False
     )
     name = models.CharField(
         verbose_name="Название рецепта",
         help_text="Введите название рецепта",
         max_length=128,
-        index=True,
+        db_index=True,
         blank=False
     )
     image = models.ImageField(
@@ -25,7 +26,7 @@ class Recipe(models.Model):
     description = models.TextField(
         verbose_name="Описание рецепта",
         help_text="Введите описание рецепта",
-        blank=False
+
     )
     ingredient = models.ManyToManyField(
         "Ingredient",
@@ -37,7 +38,6 @@ class Recipe(models.Model):
     time = models.TimeField(
         help_text="Время приготовления"
     )
-    tags = models.ManyToOneRel("Tag")
 
     def __str__(self):
         return self.name
@@ -55,7 +55,7 @@ class Tag(models.Model):
         help_text="Введите имя тега",
         max_length=128,
         unique=True,
-        index=True,
+        db_index=True,
         blank=False
     )
     code: str = models.CharField(
@@ -70,8 +70,14 @@ class Tag(models.Model):
         help_text="Введите slug поле Тега",
         max_length=128,
         unique=True,
-        index=True,
+        db_index=True,
         blank=False
+    )
+    recipe = models.ForeignKey(
+        "Recipe",
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="recipe_tag"
     )
 
     def __str__(self):
@@ -87,12 +93,13 @@ class Ingredient(models.Model):
         verbose_name="Название ингредиента",
         help_text="Введите название ингридиента",
         max_length=128,
-        index=True,
+        db_index=True,
         blank=False
     )
     quantity = models.IntegerField(
         verbose_name="Количество ингридиента",
         help_text="Введите количество ингридиента",
+        null=True,
         blank=False
     )
     measurement = models.CharField(
