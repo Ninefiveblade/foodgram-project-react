@@ -1,19 +1,21 @@
-from random import choices
 from django.db import models
 from django.contrib.auth import get_user_model
+
+from users.models import FoodgramUser
+from colorfield.fields import ColorField
 
 User = get_user_model()
 
 
 class Recipe(models.Model):
     author = models.ForeignKey(
-        User,
+        FoodgramUser,
         verbose_name="Автор рецепта",
         on_delete=models.CASCADE,
         db_index=True,
         blank=False
     )
-    name = models.CharField(
+    name: str = models.CharField(
         verbose_name="Название рецепта",
         help_text="Введите название рецепта",
         max_length=128,
@@ -23,7 +25,7 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name="Картинка блюда",
     )
-    description = models.TextField(
+    description: str = models.TextField(
         verbose_name="Описание рецепта",
         help_text="Введите описание рецепта",
 
@@ -48,7 +50,6 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
 
 
-
 class Tag(models.Model):
     name: str = models.CharField(
         verbose_name="Имя тега",
@@ -58,10 +59,10 @@ class Tag(models.Model):
         db_index=True,
         blank=False
     )
-    code: str = models.CharField(
+    code: str = ColorField(
         verbose_name="Код цвета HEX",
         help_text="Введите код цвета HEX",
-        max_length=128,
+        max_length=7,
         unique=True,
         blank=False
     )
@@ -73,10 +74,9 @@ class Tag(models.Model):
         db_index=True,
         blank=False
     )
-    recipe = models.ForeignKey(
+    recipe = models.ManyToManyField(
         "Recipe",
-        null=True,
-        on_delete=models.SET_NULL,
+        verbose_name="Теги по рецептам",
         related_name="recipe_tag"
     )
 
@@ -88,21 +88,22 @@ class Tag(models.Model):
         verbose_name = 'Тег'
         verbose_name_plural = 'Тэги'
 
+
 class Ingredient(models.Model):
-    name = models.CharField(
+    name: str = models.CharField(
         verbose_name="Название ингредиента",
         help_text="Введите название ингридиента",
         max_length=128,
         db_index=True,
         blank=False
     )
-    quantity = models.IntegerField(
+    quantity: int = models.IntegerField(
         verbose_name="Количество ингридиента",
         help_text="Введите количество ингридиента",
         null=True,
         blank=False
     )
-    measurement = models.CharField(
+    measurement: str = models.CharField(
         verbose_name="Единица измерения ингридиента",
         help_text="Введите единицу измерения",
         max_length=15
@@ -112,6 +113,6 @@ class Ingredient(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['-name']
+        ordering = ['id']
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
