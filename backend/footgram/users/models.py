@@ -1,8 +1,6 @@
+"""Модели приложения users."""
 from django.db import models
 from django.contrib.auth.models import AbstractUser, AnonymousUser
-from django.contrib.auth import get_user
-
-
 
 
 class FoodgramUser(AbstractUser):
@@ -14,9 +12,10 @@ class FoodgramUser(AbstractUser):
         (ADMIN, 'Administrator'),
     ]
 
-    first_name = models.CharField(max_length=30, blank=False)
+    first_name = models.CharField(max_length=150, blank=False)
     last_name = models.CharField(max_length=150, blank=False)
-    email = models.EmailField(blank=False)
+    email = models.EmailField(max_length=254, blank=False, unique=True)
+    password = models.CharField(max_length=150, blank=False)
 
     role = models.CharField(max_length=100, choices=ROLES, default=USER)
 
@@ -41,3 +40,23 @@ class Guest(AnonymousUser):
     @property
     def is_guest(self):
         return True
+
+
+class Follow(models.Model):
+    """Модели подписок."""
+    user = models.ForeignKey(
+        FoodgramUser,
+        on_delete=models.CASCADE,
+        related_name='follower'
+    )
+    author = models.ForeignKey(
+        FoodgramUser,
+        on_delete=models.CASCADE,
+        related_name='following'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'author'],
+                                    name='unique_follows')
+        ]

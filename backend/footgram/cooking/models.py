@@ -1,13 +1,14 @@
+"""Модели приложения cooking."""
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 
-from users.models import FoodgramUser
 from colorfield.fields import ColorField
 
-User = get_user_model()
+from users.models import FoodgramUser
 
 
 class Recipe(models.Model):
+    """Модель рецепта."""
     author = models.ForeignKey(
         FoodgramUser,
         verbose_name="Автор рецепта",
@@ -37,8 +38,12 @@ class Recipe(models.Model):
         related_name="reciepe_ingredient",
         blank=False
     )
-    time = models.TimeField(
-        help_text="Время приготовления"
+    time = models.IntegerField(
+        verbose_name="Время приготовления в минутах",
+        help_text="Введите время приготовления в минутах",
+        validators=[
+            MinValueValidator(1)
+        ]
     )
 
     def __str__(self):
@@ -51,6 +56,7 @@ class Recipe(models.Model):
 
 
 class Tag(models.Model):
+    """Модель тега."""
     name: str = models.CharField(
         verbose_name="Имя тега",
         help_text="Введите имя тега",
@@ -61,7 +67,6 @@ class Tag(models.Model):
     )
     code: str = ColorField(
         verbose_name="Код цвета HEX",
-        help_text="Введите код цвета HEX",
         max_length=7,
         unique=True,
         blank=False
@@ -90,6 +95,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
+    """Модель ингридиента."""
     name: str = models.CharField(
         verbose_name="Название ингредиента",
         help_text="Введите название ингридиента",
@@ -116,3 +122,33 @@ class Ingredient(models.Model):
         ordering = ['id']
         verbose_name = 'Ингридиент'
         verbose_name_plural = 'Ингридиенты'
+
+
+class FavoriteRecipes(models.Model):
+    """Модель избранного."""
+    user = models.ForeignKey(
+        FoodgramUser,
+        verbose_name="Пользователь избранных рецептов",
+        related_name="favotite_list_user",
+        on_delete=models.CASCADE
+    )
+    recipe = models.ManyToManyField(
+        "Recipe",
+        verbose_name="Избранный рецепт",
+        related_name="favorite_recipe"
+    )
+
+
+class ShopList(models.Model):
+    """Модель покупок."""
+    user = models.ForeignKey(
+        FoodgramUser,
+        verbose_name="Пользователь избранных рецептов",
+        related_name="shop_list_user",
+        on_delete=models.CASCADE
+    )
+    recipe = models.ManyToManyField(
+        "Recipe",
+        verbose_name="Избранный рецепт",
+        related_name="shop_recipe"
+    )
