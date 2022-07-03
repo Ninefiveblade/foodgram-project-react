@@ -103,12 +103,6 @@ class Ingredient(models.Model):
         db_index=True,
         blank=False
     )
-    quantity: int = models.IntegerField(
-        verbose_name="Количество ингридиента",
-        help_text="Введите количество ингридиента",
-        null=True,
-        blank=False
-    )
     measurement: str = models.CharField(
         verbose_name="Единица измерения ингридиента",
         help_text="Введите единицу измерения",
@@ -137,6 +131,10 @@ class FavoriteRecipes(models.Model):
         verbose_name="Избранный рецепт",
         related_name="favorite_recipe"
     )
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
 
 
 class ShopList(models.Model):
@@ -152,3 +150,34 @@ class ShopList(models.Model):
         verbose_name="Избранный рецепт",
         related_name="shop_recipe"
     )
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списки покупок'
+
+
+class IngredientQuantity(models.Model):
+    ingredient = models.ForeignKey(
+        Ingredient,
+        verbose_name="Ингридиент",
+        related_name="ingredient_amount",
+        null=True,
+        on_delete=models.SET_NULL
+    )
+    quantity: int = models.IntegerField(
+        verbose_name="Количество ингридиента",
+        help_text="Введите количество ингридиента",
+        validators=[
+            MinValueValidator(1)
+        ],
+        null=True,
+        blank=False
+    )
+    
+    def __str__(self):
+        return f"id: {self.id}, {self.ingredient} {self.quantity} {self.ingredient.measurement}"
+    
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Количество ингридиента'
+        verbose_name_plural = 'Количество ингридиентов'

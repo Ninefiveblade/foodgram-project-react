@@ -2,7 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, AnonymousUser
 
-
+    
 class FoodgramUser(AbstractUser):
     """Кастомная модель юзера."""
     USER = 'user'
@@ -16,7 +16,6 @@ class FoodgramUser(AbstractUser):
     last_name = models.CharField(max_length=150, blank=False)
     email = models.EmailField(max_length=254, blank=False, unique=True)
     password = models.CharField(max_length=150, blank=False)
-
     role = models.CharField(max_length=100, choices=ROLES, default=USER)
 
     @property
@@ -29,9 +28,10 @@ class FoodgramUser(AbstractUser):
     
     class Meta:
         ordering = ['-username']
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
 
-# Под вопросом
 class Guest(AnonymousUser):
     """Модель гостя"""
     def __str__(self):
@@ -60,3 +60,8 @@ class Follow(models.Model):
             models.UniqueConstraint(fields=['user', 'author'],
                                     name='unique_follows')
         ]
+    
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'

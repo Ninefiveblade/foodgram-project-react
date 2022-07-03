@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Recipe, Ingredient, Tag, FavoriteRecipes, ShopList
+from .models import Recipe, Ingredient, Tag, FavoriteRecipes, ShopList, IngredientQuantity
 from users.models import FoodgramUser, Follow
 
 
@@ -49,3 +49,4 @@ admin.site.register(FoodgramUser, FoodgramUserAdmin)
 admin.site.register(FavoriteRecipes)
 admin.site.register(ShopList)
 admin.site.register(Follow)
+admin.site.register(IngredientQuantity)
