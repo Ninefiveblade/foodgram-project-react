@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from djoser.serializers import UserCreateSerializer
 
 from cooking import models
 from users.models import FoodgramUser
@@ -18,3 +19,9 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     pass
+
+class CustomUserCreateSerializer(UserCreateSerializer):
+    User = FoodgramUser()
+    
+    pass
+
