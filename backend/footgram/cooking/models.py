@@ -1,7 +1,6 @@
 """Модели приложения cooking."""
 from django.db import models
 from django.core.validators import MinValueValidator
-
 from colorfield.fields import ColorField
 
 from users.models import FoodgramUser

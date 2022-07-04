@@ -2,7 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, AnonymousUser
 
-    
+
 class FoodgramUser(AbstractUser):
     """Кастомная модель юзера."""
     USER = 'user'
