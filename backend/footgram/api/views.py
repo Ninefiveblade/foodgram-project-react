@@ -7,7 +7,6 @@ from rest_framework.response import Response
 from rest_framework.authtoken import views
 from djoser.views import UserViewSet, TokenCreateView
 
-
 from . import serializers
 from users.models import FoodgramUser
 from cooking import models
@@ -26,4 +25,3 @@ class TagViewSet(viewsets.ModelViewSet):
 class IngredientViewset(viewsets.ModelViewSet):
     queryset = models.Ingredient.objects.all()
     serializer_class = serializers.IngredientSerializer
-

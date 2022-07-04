@@ -116,6 +116,14 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTH_USER_MODEL = 'users.FoodgramUser'
 DJOSER = {
     'LOGIN_FIELD': 'email',
+    'HIDE_USERS': False,
+    'SERIALIZERS': {
+        'user': 'api.serializers.FoodgramUserSerializer',
+        'user_list': 'api.serializers.FoodgramUserSerializer',
+        'current_user': 'api.serializers.FoodgramUserSerializer',
+        'user_create': 'api.serializers.FoodgramUserSerializer',
+    },
+
 }
 
 
