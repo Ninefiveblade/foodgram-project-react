@@ -1,14 +1,12 @@
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken import views
-from djoser.views import UserViewSet, TokenCreateView
 
+from .mixins import CustomViewSet
 from . import serializers
-from users.models import FoodgramUser
 from cooking import models
 
 
@@ -17,11 +15,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.RecipeSerializer
 
 
-class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(CustomViewSet):
     queryset = models.Recipe.objects.all()
     serializer_class = serializers.TagSerializer
 
 
-class IngredientViewset(viewsets.ModelViewSet):
+class IngredientViewset(CustomViewSet):
     queryset = models.Ingredient.objects.all()
     serializer_class = serializers.IngredientSerializer

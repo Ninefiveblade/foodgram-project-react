@@ -2,7 +2,7 @@ from rest_framework import serializers
 from djoser.serializers import UserCreateSerializer
 
 from cooking import models
-from users.models import FoodgramUser
+from users.models import FoodgramUser, Follow
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -26,10 +26,6 @@ class TagSerializer(serializers.ModelSerializer):
     pass
 
 
-class UserSerializer(serializers.ModelSerializer):
-    pass
-
-
 class FoodgramUserSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     class Meta:
@@ -50,4 +46,4 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
         return ret 
 
     def get_is_subscribed(self, obj):
-        return True
+        return False
