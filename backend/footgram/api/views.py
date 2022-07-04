@@ -16,7 +16,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class TagViewSet(CustomViewSet):
-    queryset = models.Recipe.objects.all()
+    queryset = models.Tag.objects.all()
     serializer_class = serializers.TagSerializer
 
 

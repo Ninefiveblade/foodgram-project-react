@@ -2,13 +2,14 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from colorfield.fields import ColorField
+from django.utils.html import format_html
 
 from users.models import FoodgramUser
 
 
 class Recipe(models.Model):
     """Модель рецепта."""
-    author = models.ForeignKey(
+    author: FoodgramUser = models.ForeignKey(
         FoodgramUser,
         verbose_name="Автор рецепта",
         on_delete=models.CASCADE,
@@ -22,7 +23,7 @@ class Recipe(models.Model):
         db_index=True,
         blank=False
     )
-    image = models.ImageField(
+    image: str = models.ImageField(
         verbose_name="Картинка блюда",
     )
     description: str = models.TextField(
@@ -37,12 +38,17 @@ class Recipe(models.Model):
         related_name="reciepe_ingredient",
         blank=False
     )
-    time = models.IntegerField(
+    time: int = models.IntegerField(
         verbose_name="Время приготовления в минутах",
         help_text="Введите время приготовления в минутах",
         validators=[
             MinValueValidator(1)
         ]
+    )
+    tag = models.ManyToManyField(
+        "Tag",
+        verbose_name="Теги по рецептам",
+        related_name="recipe_tag",
     )
 
     def __str__(self):
@@ -55,6 +61,11 @@ class Recipe(models.Model):
 
 
 class Tag(models.Model):
+    COLOR_PALETTE = [
+        ("#E26C2D", "Оранжевый", ),
+        ("#228b22", "Зеленый", ),
+        ("#9370d8", "Лиловый", ),
+    ]
     """Модель тега."""
     name: str = models.CharField(
         verbose_name="Имя тега",
@@ -67,6 +78,7 @@ class Tag(models.Model):
     code: str = ColorField(
         verbose_name="Код цвета HEX",
         max_length=7,
+        samples=COLOR_PALETTE,
         unique=True,
         blank=False
     )
@@ -76,19 +88,19 @@ class Tag(models.Model):
         max_length=128,
         unique=True,
         db_index=True,
-        blank=False
-    )
-    recipe = models.ManyToManyField(
-        "Recipe",
-        verbose_name="Теги по рецептам",
-        related_name="recipe_tag"
     )
 
     def __str__(self):
         return self.name
+    
+    def colored_name(self):
+        return format_html(
+            '<span style="color: #{};">{}</span>',
+            self.code,
+        )
 
     class Meta:
-        ordering = ['-name']
+        ordering = ['id']
         verbose_name = 'Тег'
         verbose_name_plural = 'Тэги'
 

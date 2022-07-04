@@ -23,7 +23,11 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class TagSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = models.Tag
+        fields = (
+            'id', 'name', 'code', 'slug' 
+        )
 
 
 class FoodgramUserSerializer(serializers.ModelSerializer):
