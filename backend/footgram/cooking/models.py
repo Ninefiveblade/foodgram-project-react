@@ -31,7 +31,7 @@ class Recipe(models.Model):
 
     )
     ingredient = models.ManyToManyField(
-        "Ingredient",
+        "IngredientQuantity",
         verbose_name="Ингридиенты рецепта",
         help_text="Выберите ингридиенты рецепта",
         related_name="reciepe_ingredient",
@@ -179,7 +179,7 @@ class IngredientQuantity(models.Model):
     )
     
     def __str__(self):
-        return f"id: {self.id}, {self.ingredient} {self.quantity} {self.ingredient.measurement}"
+        return f"{self.ingredient} {self.quantity} {self.ingredient.measurement}"
     
     class Meta:
         ordering = ['id']

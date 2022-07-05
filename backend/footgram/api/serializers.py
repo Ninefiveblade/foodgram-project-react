@@ -5,14 +5,15 @@ from cooking import models
 from users.models import FoodgramUser, Follow
 
 
-class IngredienAmountSerializer(serializers.ModelSerializer):
+class IngredientAmountSerializer(serializers.ModelSerializer):
+    id = serializers.RelatedField(source='ingredient_id__', read_only=True)
+    amount = serializers.IntegerField(source='quantity')
     class Meta:
-        model = models.Ingredient
+        model = models.IngredientQuantity
         fields = (
-            'ingredient',
-            'quantity',
+            'id',
+            'amount',
         )
-
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,8 +59,7 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     author = FoodgramUserSerializer(read_only=True)
-    tags = serializers.SerializerMethodField()
-    ingredient = IngredientSerializer(many=True)
+    ingredient = IngredientAmountSerializer(many=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -73,7 +73,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
             'name',
-            'image',
             'text',
             'time',
         )
