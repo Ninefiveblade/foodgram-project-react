@@ -14,6 +14,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = models.Recipe.objects.all()
     serializer_class = serializers.RecipeSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(
+            author=self.request.user,
+        )
+
 
 class TagViewSet(CustomViewSet):
     queryset = models.Tag.objects.all()
@@ -21,5 +26,5 @@ class TagViewSet(CustomViewSet):
 
 
 class IngredientViewset(CustomViewSet):
-    queryset = models.Ingredient.objects.all()
+    queryset = models.IngredientQuantity.objects.all()
     serializer_class = serializers.IngredientSerializer

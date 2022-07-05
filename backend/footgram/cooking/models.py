@@ -2,7 +2,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from colorfield.fields import ColorField
-from django.utils.html import format_html
 
 from users.models import FoodgramUser
 
@@ -26,7 +25,7 @@ class Recipe(models.Model):
     image: str = models.ImageField(
         verbose_name="Картинка блюда",
     )
-    description: str = models.TextField(
+    text: str = models.TextField(
         verbose_name="Описание рецепта",
         help_text="Введите описание рецепта",
 
@@ -45,10 +44,10 @@ class Recipe(models.Model):
             MinValueValidator(1)
         ]
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         "Tag",
         verbose_name="Теги по рецептам",
-        related_name="recipe_tag",
+        related_name="recipe_tags",
     )
 
     def __str__(self):
@@ -61,12 +60,12 @@ class Recipe(models.Model):
 
 
 class Tag(models.Model):
+    """Модель тега."""
     COLOR_PALETTE = [
         ("#E26C2D", "Оранжевый", ),
         ("#228b22", "Зеленый", ),
         ("#9370d8", "Лиловый", ),
     ]
-    """Модель тега."""
     name: str = models.CharField(
         verbose_name="Имя тега",
         help_text="Введите имя тега",
@@ -92,12 +91,6 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-    
-    def colored_name(self):
-        return format_html(
-            '<span style="color: #{};">{}</span>',
-            self.code,
-        )
 
     class Meta:
         ordering = ['id']
@@ -172,8 +165,8 @@ class IngredientQuantity(models.Model):
         Ingredient,
         verbose_name="Ингридиент",
         related_name="ingredient_amount",
-        null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.CASCADE,
+        blank=False,
     )
     quantity: int = models.IntegerField(
         verbose_name="Количество ингридиента",

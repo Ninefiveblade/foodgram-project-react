@@ -10,7 +10,7 @@ class RecipeAdmin(admin.ModelAdmin):
         "name",
         "author"
     )
-    list_filter = ("name", "author", "tag")
+    list_filter = ("name", "author", "tags")
 
 
 class TagAdmin(admin.ModelAdmin):
