@@ -21,11 +21,11 @@ class FoodgramUser(AbstractUser):
     @property
     def is_admin(self):
         return self.is_superuser or self.role == FoodgramUser.ADMIN
-    
+
     @property
     def is_user(self):
         return self.role == FoodgramUser.USER
-    
+
     class Meta:
         ordering = ['-username']
         verbose_name = 'Пользователь'
@@ -57,11 +57,9 @@ class Follow(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'author'],
+            models.UniqueConstraint(fields=['user_id', 'author_id'],
                                     name='unique_follows')
         ]
-    
-    class Meta:
         ordering = ['id']
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'

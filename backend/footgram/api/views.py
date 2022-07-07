@@ -14,14 +14,12 @@ from users.models import Follow
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = models.Recipe.objects.all()
 
-
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve',):
             return serializers.RecipeOutSerializer
         elif self.action in ('partial_update', 'create'):
             return serializers.RecipeSerializer
         return serializers.RecipeOutSerializer
-
 
     def perform_create(self, serializer):
         serializer.save(
@@ -35,17 +33,17 @@ class TagViewSet(CustomListRetriveViewSet):
 
 
 class IngredientViewset(CustomListRetriveViewSet):
-    queryset = models.IngredientQuantity.objects.all()
-    serializer_class = serializers.IngredientAmountOutSerializer
+    queryset = models.Ingredient.objects.all()
+    serializer_class = serializers.IngredientSerializer
 
 
 class FollowViewSet(CustomCreateDestroyViewSet):
     queryset = Follow.objects.all()
-    serializer_class = serializers.UserFollowSerializer
+    serializer_class = serializers.FoodgramFollowSerializer
 
     def perform_create(self, serializer):
-        user_id = self.kwargs.get('id')
+        author = models.FoodgramUser.objects.get(id=self.kwargs.get('id'))
         serializer.save(
-            author=self.request.user,
-            user=author.
+            author=author,
+            user=self.request.user
         )

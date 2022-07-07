@@ -136,6 +136,7 @@ class FavoriteRecipes(models.Model):
         verbose_name="Избранный рецепт",
         related_name="favorite_recipe"
     )
+
     class Meta:
         ordering = ['id']
         verbose_name = 'Избранный рецепт'
@@ -155,6 +156,7 @@ class ShopList(models.Model):
         verbose_name="Избранный рецепт",
         related_name="shop_recipe"
     )
+
     class Meta:
         ordering = ['id']
         verbose_name = 'Список покупок'
@@ -178,10 +180,12 @@ class IngredientQuantity(models.Model):
         null=True,
         blank=False
     )
-    
+
     def __str__(self):
-        return f"{self.ingredient} {self.quantity} {self.ingredient.measurement}"
-    
+        return (
+            f"{self.ingredient} {self.quantity} {self.ingredient.measurement}"
+        )
+
     class Meta:
         ordering = ['id']
         verbose_name = 'Количество ингридиента'
