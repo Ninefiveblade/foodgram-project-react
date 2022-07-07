@@ -5,14 +5,23 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authtoken import views
 
-from .mixins import CustomViewSet
+from .mixins import CustomListRetriveViewSet, CustomCreateDestroyViewSet
 from . import serializers
 from cooking import models
+from users.models import Follow
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = models.Recipe.objects.all()
-    serializer_class = serializers.RecipeSerializer
+
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve',):
+            return serializers.RecipeOutSerializer
+        elif self.action in ('partial_update', 'create'):
+            return serializers.RecipeSerializer
+        return serializers.RecipeOutSerializer
+
 
     def perform_create(self, serializer):
         serializer.save(
@@ -20,11 +29,23 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
 
 
-class TagViewSet(CustomViewSet):
+class TagViewSet(CustomListRetriveViewSet):
     queryset = models.Tag.objects.all()
     serializer_class = serializers.TagSerializer
 
 
-class IngredientViewset(CustomViewSet):
+class IngredientViewset(CustomListRetriveViewSet):
     queryset = models.IngredientQuantity.objects.all()
-    serializer_class = serializers.IngredientSerializer
+    serializer_class = serializers.IngredientAmountOutSerializer
+
+
+class FollowViewSet(CustomCreateDestroyViewSet):
+    queryset = Follow.objects.all()
+    serializer_class = serializers.UserFollowSerializer
+
+    def perform_create(self, serializer):
+        user_id = self.kwargs.get('id')
+        serializer.save(
+            author=self.request.user,
+            user=author.
+        )

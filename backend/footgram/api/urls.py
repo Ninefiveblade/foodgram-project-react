@@ -10,6 +10,7 @@ router.register(r'^users', UserViewSet, basename='users')
 router.register(r'^tags', views.TagViewSet, basename='tags')
 router.register(r'^recipes', views.RecipeViewSet, basename='recipes')
 router.register(r'^ingredients', views.IngredientViewset, basename='ingredients')
+router.register( r'^users/(?P<id>\d+)/subscribe', views.FollowViewSet, basename='follows')
 
 urlpatterns = [
     path('', include(router.urls)),

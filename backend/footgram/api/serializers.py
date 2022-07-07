@@ -1,12 +1,11 @@
-from jinja2 import pass_context
 from rest_framework import serializers
 
 from cooking import models
 from users.models import FoodgramUser, Follow
 
 
-class IngredientAmountSerializer(serializers.ModelSerializer):
-    id = serializers.RelatedField(source='ingredient_id__', read_only=True)
+class IngredientAmountInSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(source='ingredient_id.id', queryset=models.Ingredient.objects.all())
     amount = serializers.IntegerField(source='quantity')
     class Meta:
         model = models.IngredientQuantity
@@ -15,13 +14,19 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
             'amount',
         )
 
-class IngredientSerializer(serializers.ModelSerializer):
+
+class IngredientAmountOutSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(source="ingredient.id")
+    name = serializers.ReadOnlyField(source="ingredient.name")
+    measurment_unit = serializers.ReadOnlyField(source="ingredient.measurement")
+    amount = serializers.ReadOnlyField(source="quantity")
     class Meta:
-        model = models.Ingredient
+        model = models.IngredientQuantity
         fields = (
             'id',
             'name',
-            'measurement',
+            'amount',
+            'measurment_unit',
         )
 
 
@@ -57,9 +62,44 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
         return False
 
 
+class RecipeShortSerializer(serializers.ModelSerializer):
+    cooking_time = serializers.IntegerField(source="time")
+    class Meta:
+        model = models.Recipe
+        fields = (
+            "id",
+            "name",
+            "image",
+            "cooking_time"
+        )
+
+
+class UserFollowSerializer(serializers.Serializer):
+    email = serializers.ReadOnlyField(source='author.email')
+    id = serializers.ReadOnlyField(source='author.id')
+    username = serializers.ReadOnlyField(source='author.username')
+    first_name = serializers.ReadOnlyField(source='author.first_name')
+    last_name = serializers.ReadOnlyField(source='author.last_name')
+    recipes = RecipeShortSerializer(many=True, read_only=True)
+    class Meta:
+        model = Follow
+        fields = (
+                'email',
+                'id',
+                'username',
+                'first_name',
+                'last_name',
+                'recipes',
+            )
+    def create(self, validated_data):
+        print(validated_data)
+        return super().create(validated_data)
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     author = FoodgramUserSerializer(read_only=True)
-    ingredient = IngredientAmountSerializer(many=True)
+    ingredient = IngredientAmountInSerializer(many=True)
+    current_time = serializers.IntegerField(source="time")
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -74,7 +114,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'is_in_shopping_cart',
             'name',
             'text',
-            'time',
+            'current_time',
         )
     
     def create(self, validated_data):
@@ -88,3 +128,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     
     def get_is_in_shopping_cart(self, obj):
         return False
+
+
+class RecipeOutSerializer(RecipeSerializer):
+    ingredient = IngredientAmountOutSerializer(many=True)
+    tags = TagSerializer(many=True)
