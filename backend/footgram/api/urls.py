@@ -1,4 +1,4 @@
-"""Роутинг приложения API."""
+"""Rout module for api app."""
 from django.urls import include, path
 from djoser.views import UserViewSet, TokenDestroyView, TokenCreateView
 from rest_framework import routers

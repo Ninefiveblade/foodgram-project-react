@@ -32,16 +32,6 @@ class FoodgramUser(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
 
-class Guest(AnonymousUser):
-    """Модель гостя"""
-    def __str__(self):
-        return 'Guest'
-
-    @property
-    def is_guest(self):
-        return True
-
-
 class Follow(models.Model):
     """Модели подписок."""
     user = models.ForeignKey(

@@ -1,3 +1,4 @@
+"""Custom field module for api serializers module."""
 import base64
 import six
 import uuid
@@ -7,7 +8,7 @@ from django.core.files.base import ContentFile
 
 
 class Base64ImageField(serializers.ImageField):
-
+    """Custom serializer field for encode base64 image."""
     def to_internal_value(self, data):
         if isinstance(data, six.string_types):
             if 'data:' in data and ';base64,' in data:
