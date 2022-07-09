@@ -66,7 +66,7 @@ class TagSerializer(serializers.ModelSerializer):
 class FoodgramUserSerializer(serializers.ModelSerializer):
     """FoodgramUser model serializer."""
     is_subscribed = serializers.SerializerMethodField()
-    # доделать
+
     class Meta:
         model = FoodgramUser
         fields = (
@@ -79,7 +79,33 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        return None
+        return False
+
+
+class FoodramRegisterInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FoodgramUser
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'password'
+        )
+
+
+class FoodgramRegisterOutSerializer(serializers.ModelSerializer):
+    """FoodgramUser model serializer."""
+    class Meta:
+        model = FoodgramUser
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+        )
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -100,6 +126,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',
             'name',
+            'image',
             'text',
             'current_time',
         )
@@ -119,7 +146,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             tag = models.Tag.objects.get(id=tag_data.id)
             recipe.tags.add(tag)
         return recipe
-    
+
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('ingredient')
         tags = validated_data.pop('tags')
@@ -136,8 +163,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.text = validated_data.get('text', instance.text)
         instance.name = validated_data.get('name', instance.name)
         instance.time = validated_data.get('time', instance.time)
+        instance.image = validated_data.get('image', instance.image)
         return instance
-        
 
     def get_is_favorited(self, obj):
         return False
@@ -150,6 +177,7 @@ class RecipeOutSerializer(RecipeSerializer):
     """Resipe model POST response/GET requests serializer."""
     ingredient = IngredientAmountOutSerializer(many=True)
     tags = TagSerializer(many=True)
+    image = Base64ImageField()
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):
@@ -172,7 +200,11 @@ class FoodgramFollowSerializer(serializers.Serializer):
     username = serializers.ReadOnlyField(source='author.username')
     first_name = serializers.ReadOnlyField(source='author.first_name')
     last_name = serializers.ReadOnlyField(source='author.last_name')
-    recipes = RecipeShortSerializer(many=True, read_only=True)
+    recipes = RecipeShortSerializer(
+        many=True,
+        read_only=True,
+        source="author.recipe_user"
+    )
 
     class Meta:
         model = Follow
@@ -187,3 +219,11 @@ class FoodgramFollowSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return Follow.objects.create(**validated_data)
+
+
+class ShopCartSerializer(serializers.Serializer):
+    pass
+
+
+class FavoriteRecipesSerializer(serializers.Serializer):
+    pass

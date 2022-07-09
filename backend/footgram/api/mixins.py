@@ -2,12 +2,15 @@
 from rest_framework import mixins, viewsets
 from rest_framework.response import Response
 
+
 class PatchModelMixin(object):
     """PATCH a model instance."""
     def partial_update(self, request, *args, **kwargs):
         partial = True
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial
+        )
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
@@ -19,6 +22,7 @@ class PatchModelMixin(object):
     def perform_update(self, serializer):
         serializer.save()
 
+
 class CustomListRetriveViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -27,6 +31,7 @@ class CustomListRetriveViewSet(
     """Custom mixin for GET request only."""
     pass
 
+
 class CustomCreateDestroyViewSet(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
@@ -34,6 +39,7 @@ class CustomCreateDestroyViewSet(
 ):
     """Custom mixin for POST, DELETE request only."""
     pass
+
 
 class RecipeMixin(
     mixins.CreateModelMixin,

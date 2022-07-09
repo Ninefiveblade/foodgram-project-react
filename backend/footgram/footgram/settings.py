@@ -121,7 +121,7 @@ DJOSER = {
         'user': 'api.serializers.FoodgramUserSerializer',
         'user_list': 'api.serializers.FoodgramUserSerializer',
         'current_user': 'api.serializers.FoodgramUserSerializer',
-        'user_create': 'api.serializers.FoodgramUserSerializer',
+        'user_create': 'api.serializers.FoodramRegisterInSerializer',
     },
 
 }

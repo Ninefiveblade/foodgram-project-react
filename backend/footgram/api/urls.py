@@ -6,14 +6,14 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r'^users', UserViewSet, basename='users')
+router.register(r'^users', views.FoodgramUserViewSet, basename='users')
 router.register(r'^tags', views.TagViewSet, basename='tags')
 router.register(r'^recipes', views.RecipeViewSet, basename='recipes')
 router.register(
     r'^ingredients', views.IngredientViewset, basename='ingredients'
 )
 router.register(
-    r'^users/(?P<id>\d+)/subscribe', views.FollowViewSet, basename='follows'
+    r'^users/(?P<id>\d+)/subscribe', views.FollowViewSet, basename='follow'
 )
 
 urlpatterns = [
@@ -24,5 +24,5 @@ urlpatterns = [
         name="reset_password"
     ),
     path('auth/token/login/', TokenCreateView.as_view(), name="login"),
-    path('auth/token/logout/', TokenDestroyView.as_view(), name="logout")
+    path('auth/token/logout/', TokenDestroyView.as_view(), name="logout"),
 ]

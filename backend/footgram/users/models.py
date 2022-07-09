@@ -1,6 +1,6 @@
 """Модели приложения users."""
 from django.db import models
-from django.contrib.auth.models import AbstractUser, AnonymousUser
+from django.contrib.auth.models import AbstractUser
 
 
 class FoodgramUser(AbstractUser):
