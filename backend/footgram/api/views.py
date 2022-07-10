@@ -2,6 +2,8 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from djoser.views import UserViewSet
+from django.db import IntegrityError
+from django.http import FileResponse
 
 from .mixins import (
     CustomListRetriveViewSet, CustomCreateDestroyViewSet, RecipeMixin
@@ -12,6 +14,7 @@ from users.models import Follow
 
 
 class RecipeViewSet(RecipeMixin):
+    """Recipes viewsets."""
     queryset = models.Recipe.objects.all()
 
     def create(self, request, *args, **kwargs):
@@ -36,9 +39,9 @@ class RecipeViewSet(RecipeMixin):
             return Response(serializer.errors, 400)
 
     def get_serializer_class(self):
-        if self.action in ('list', 'retrieve',):
+        if self.action in ("list", "retrieve",):
             return serializers.RecipeOutSerializer
-        if self.action in ('partial_update',):
+        if self.action in ("partial_update",):
             return serializers.RecipeOutSerializer
 
     def perform_create(self, serializer):
@@ -62,13 +65,13 @@ class FollowViewSet(CustomCreateDestroyViewSet):
     queryset = Follow.objects.all()
 
     def perform_create(self, serializer):
-        author = models.FoodgramUser.objects.get(id=self.kwargs.get('id'))
+        author = models.FoodgramUser.objects.get(id=self.kwargs.get("id"))
         serializer.save(
             author=author,
             user=self.request.user
         )
 
-    @action(methods=['delete'], detail=False)
+    @action(methods=["delete"], detail=False)
     def delete(self, request, id):
         try:
             models.FoodgramUser.objects.get(id=id)
@@ -92,10 +95,38 @@ class FoodgramUserViewSet(UserViewSet):
         else:
             return Response(serializer.errors, 400)
 
-    @action(methods=('GET',), detail=False)
+    @action(methods=("get",), detail=False)
     def subscriptions(self, request):
         follows = Follow.objects.filter(user=request.user)
         list_of_authors = []
         for follow in follows:
             list_of_authors.append(self.serializer_class(follow.author).data)
         return Response(list_of_authors, 200)
+
+
+class ShopingCardViewSet(CustomCreateDestroyViewSet):
+    serializer_class = serializers.RecipeShortSerializer
+
+    def create(self, request, *args, **kwargs):
+        recipe = models.Recipe.objects.get(id=self.kwargs.get('recipe_id'))
+        try:
+            models.ShopList.objects.create(user=request.user, recipe=recipe)
+        except IntegrityError:
+            return Response({"errors": "Вы уже добавили товар в корзину!"}, 400)
+        serializer = self.serializer_class(recipe)
+        return Response(serializer.data, 201)
+
+    @action(methods=["delete"], detail=False)
+    def delete(self, request, recipe_id):
+        try:
+            models.Recipe.objects.get(id=recipe_id)
+            models.ShopList.objects.get(recipe_id=recipe_id, user=request.user).delete()
+            return Response(status=204)
+        except models.Recipe.DoesNotExist:
+            return Response({"errors": "Выбранного рецепта не существует!"}, 400)
+        except models.ShopList.DoesNotExist:
+            return Response({"detail": "Страница не найдена."}, 404)
+
+
+class FavoriteRecipes(CustomCreateDestroyViewSet):
+    pass

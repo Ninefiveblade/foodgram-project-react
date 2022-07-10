@@ -131,13 +131,16 @@ class FavoriteRecipes(models.Model):
         related_name="favotite_list_user",
         on_delete=models.CASCADE
     )
-    recipe = models.ManyToManyField(
+    recipe = models.ForeignKey(
         "Recipe",
         verbose_name="Избранный рецепт",
-        related_name="favorite_recipe"
+        related_name="favorite_recipe",
+        on_delete=models.CASCADE
     )
 
     class Meta:
+        models.UniqueConstraint(fields=['user_id', 'recipe_id'],
+                                    name='unique_favorites')
         ordering = ['id']
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
@@ -151,13 +154,18 @@ class ShopList(models.Model):
         related_name="shop_list_user",
         on_delete=models.CASCADE
     )
-    recipe = models.ManyToManyField(
+    recipe = models.ForeignKey(
         "Recipe",
         verbose_name="Избранный рецепт",
-        related_name="shop_recipe"
+        related_name="shop_recipe",
+        on_delete=models.CASCADE
     )
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user_id', 'recipe_id'],
+                                    name='unique_shoplist')
+        ]
         ordering = ['id']
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'

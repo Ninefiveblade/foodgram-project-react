@@ -220,10 +220,3 @@ class FoodgramFollowSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Follow.objects.create(**validated_data)
 
-
-class ShopCartSerializer(serializers.Serializer):
-    pass
-
-
-class FavoriteRecipesSerializer(serializers.Serializer):
-    pass

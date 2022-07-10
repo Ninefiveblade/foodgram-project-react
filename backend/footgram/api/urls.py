@@ -15,6 +15,11 @@ router.register(
 router.register(
     r'^users/(?P<id>\d+)/subscribe', views.FollowViewSet, basename='follow'
 )
+router.register(
+    r'^recipes/(?P<recipe_id>\d+)/shopping_cart',
+    views.ShopingCardViewSet,
+    basename='shop_card'
+)
 
 urlpatterns = [
     path('', include(router.urls)),
