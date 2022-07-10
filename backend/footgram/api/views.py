@@ -13,11 +13,13 @@ from .mixins import (
 from . import serializers
 from cooking import models
 from users.models import Follow
+from .pagination import ApiPagination
 
 
 class RecipeViewSet(RecipeMixin):
     """Recipes viewsets."""
     queryset = models.Recipe.objects.all()
+    pagination_class = ApiPagination
 
     @action(methods=["get"], detail=False)
     def download_shopping_cart(self, request):
