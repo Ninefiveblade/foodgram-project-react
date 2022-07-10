@@ -75,7 +75,7 @@ class Tag(models.Model):
         db_index=True,
         blank=False
     )
-    code: str = ColorField(
+    color: str = ColorField(
         verbose_name="Код цвета HEX",
         max_length=7,
         samples=COLOR_PALETTE,
@@ -128,7 +128,7 @@ class FavoriteRecipes(models.Model):
     user = models.ForeignKey(
         FoodgramUser,
         verbose_name="Пользователь избранных рецептов",
-        related_name="favotite_list_user",
+        related_name="favorite_list_user",
         on_delete=models.CASCADE
     )
     recipe = models.ForeignKey(
@@ -139,8 +139,10 @@ class FavoriteRecipes(models.Model):
     )
 
     class Meta:
-        models.UniqueConstraint(fields=['user_id', 'recipe_id'],
+        constraints = [
+            models.UniqueConstraint(fields=['user_id', 'recipe_id'],
                                     name='unique_favorites')
+        ]
         ordering = ['id']
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'

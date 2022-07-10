@@ -18,7 +18,7 @@ class TagAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "name",
-        "code",
+        "color",
         "slug"
     )
 

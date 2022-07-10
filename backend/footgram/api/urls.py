@@ -20,6 +20,11 @@ router.register(
     views.ShopingCardViewSet,
     basename='shop_card'
 )
+router.register(
+    r'^recipes/(?P<recipe_id>\d+)/favorite',
+    views.FavoriteRecipes,
+    basename='shop_card'
+)
 
 urlpatterns = [
     path('', include(router.urls)),

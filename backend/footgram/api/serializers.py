@@ -1,5 +1,6 @@
 """Serializers module for api app."""
 from rest_framework import serializers
+from rest_framework.pagination import LimitOffsetPagination
 
 from cooking import models
 from .fields import Base64ImageField
@@ -59,7 +60,7 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Tag
         fields = (
-            'id', 'name', 'code', 'slug'
+            'id', 'name', 'color', 'slug'
         )
 
 
@@ -79,7 +80,8 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        return False
+        user = self.context.get("request").user
+        return obj.following.filter(user=user).exists()
 
 
 class FoodramRegisterInSerializer(serializers.ModelSerializer):
@@ -167,10 +169,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         return instance
 
     def get_is_favorited(self, obj):
-        return False
+        user = self.context.get("request").user
+        return obj.favorite_recipe.filter(user=user).exists()
 
     def get_is_in_shopping_cart(self, obj):
-        return False
+        user = self.context.get("request").user
+        return obj.shop_recipe.filter(user=user).exists()
 
 
 class RecipeOutSerializer(RecipeSerializer):
@@ -200,11 +204,13 @@ class FoodgramFollowSerializer(serializers.Serializer):
     username = serializers.ReadOnlyField(source='author.username')
     first_name = serializers.ReadOnlyField(source='author.first_name')
     last_name = serializers.ReadOnlyField(source='author.last_name')
+    is_subscribed = serializers.SerializerMethodField()
     recipes = RecipeShortSerializer(
         many=True,
         read_only=True,
         source="author.recipe_user"
     )
+    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Follow
@@ -214,9 +220,16 @@ class FoodgramFollowSerializer(serializers.Serializer):
             'username',
             'first_name',
             'last_name',
+            'is_subscribed',
             'recipes',
+            'recipes_count'
         )
 
     def create(self, validated_data):
         return Follow.objects.create(**validated_data)
 
+    def get_recipes_count(self, obj):
+        return obj.author.recipe_user.all().count()
+    
+    def get_is_subscribed(self, obj):
+        return True 
