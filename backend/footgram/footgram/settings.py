@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'colorfield',
     'rest_framework',
-    'djoser',
     'rest_framework.authtoken',
+    'djoser',
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     'cooking.apps.CookingConfig'

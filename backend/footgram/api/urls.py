@@ -2,6 +2,7 @@
 from django.urls import include, path
 from djoser.views import UserViewSet, TokenDestroyView, TokenCreateView
 from rest_framework import routers
+from rest_framework.authtoken import views
 
 from . import views
 
@@ -11,19 +12,6 @@ router.register(r'^tags', views.TagViewSet, basename='tags')
 router.register(r'^recipes', views.RecipeViewSet, basename='recipes')
 router.register(
     r'^ingredients', views.IngredientViewset, basename='ingredients'
-)
-router.register(
-    r'^users/(?P<id>\d+)/subscribe', views.FollowViewSet, basename='follow'
-)
-router.register(
-    r'^recipes/(?P<recipe_id>\d+)/shopping_cart',
-    views.ShopingCardViewSet,
-    basename='shop_card'
-)
-router.register(
-    r'^recipes/(?P<recipe_id>\d+)/favorite',
-    views.FavoriteRecipesViewSwt,
-    basename='shop_card'
 )
 
 urlpatterns = [

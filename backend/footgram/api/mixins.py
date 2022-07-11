@@ -32,15 +32,6 @@ class CustomListRetriveViewSet(
     pass
 
 
-class CustomCreateDestroyViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    """Custom mixin for POST, DELETE request only."""
-    pass
-
-
 class RecipeMixin(
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,

@@ -22,7 +22,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 class IngredientAmountInSerializer(serializers.ModelSerializer):
     """IngredientQuantity models serializer."""
     id = serializers.PrimaryKeyRelatedField(
-        source='ingredient',
+        source='ingredients',
         queryset=models.Ingredient.objects.all()
     )
     amount = serializers.IntegerField(source='quantity')
@@ -37,11 +37,11 @@ class IngredientAmountInSerializer(serializers.ModelSerializer):
 
 class IngredientAmountOutSerializer(serializers.ModelSerializer):
     """IngredientQuantity model serializer for GET requests."""
-    id = serializers.ReadOnlyField(source="ingredient.id")
-    name = serializers.ReadOnlyField(source="ingredient.name")
+    id = serializers.ReadOnlyField(source="ingredients.id")
+    name = serializers.ReadOnlyField(source="ingredients.name")
     amount = serializers.ReadOnlyField(source="quantity")
     measurment_unit = serializers.ReadOnlyField(
-        source="ingredient.measurement"
+        source="ingredients.measurement"
     )
 
     class Meta:
@@ -80,6 +80,8 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get("request").user
+        if user.is_anonymous:
+            return False
         return obj.following.filter(user=user).exists()
 
 
@@ -112,7 +114,7 @@ class FoodgramRegisterOutSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     """Resipe model POST/PATCH/DELETE requests serializer."""
     author = FoodgramUserSerializer(read_only=True)
-    ingredient = IngredientAmountInSerializer(many=True)
+    ingredients = IngredientAmountInSerializer(many=True)
     cooking_time = serializers.IntegerField(source="time")
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -123,7 +125,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'id',
             'tags',
             'author',
-            'ingredient',
+            'ingredients',
             'is_favorited',
             'is_in_shopping_cart',
             'name',
@@ -134,7 +136,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tags = validated_data.pop("tags")
-        ingredients = validated_data.pop("ingredient")
+        ingredients = validated_data.pop("ingredients")
         recipe = models.Recipe.objects.create(**validated_data)
         for ingredient_data in ingredients:
             ingredient, bool = (
@@ -149,7 +151,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('ingredient')
+        ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         ingredient_list = []
         for ingredient_data in ingredients:
@@ -169,16 +171,20 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         user = self.context.get("request").user
+        if user.is_anonymous:
+            return False
         return obj.favorite_recipe.filter(user=user).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get("request").user
+        if user.is_anonymous:
+            return False
         return obj.shop_recipe.filter(user=user).exists()
 
 
 class RecipeOutSerializer(RecipeSerializer):
     """Resipe model POST response/GET requests serializer."""
-    ingredient = IngredientAmountOutSerializer(many=True)
+    ingredients = IngredientAmountOutSerializer(many=True)
     tags = TagSerializer(many=True)
     image = Base64ImageField()
 

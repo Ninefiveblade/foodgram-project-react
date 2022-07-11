@@ -31,11 +31,11 @@ class Recipe(models.Model):
         help_text="Введите описание рецепта",
 
     )
-    ingredient = models.ManyToManyField(
+    ingredients = models.ManyToManyField(
         "IngredientQuantity",
         verbose_name="Ингридиенты рецепта",
         help_text="Выберите ингридиенты рецепта",
-        related_name="reciepe_ingredient",
+        related_name="recipe_ingredients",
         blank=False
     )
     time: int = models.IntegerField(
@@ -174,10 +174,10 @@ class ShopList(models.Model):
 
 
 class IngredientQuantity(models.Model):
-    ingredient = models.ForeignKey(
+    ingredients = models.ForeignKey(
         Ingredient,
         verbose_name="Ингридиент",
-        related_name="ingredient_amount",
+        related_name="ingredients_amount",
         on_delete=models.CASCADE,
         blank=False,
     )
@@ -193,13 +193,13 @@ class IngredientQuantity(models.Model):
 
     def __str__(self):
         return (
-            f"{self.ingredient} {self.quantity} {self.ingredient.measurement}"
+            f"{self.ingredients} {self.quantity} {self.ingredients.measurement}"
         )
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['ingredient', 'quantity'],
-                                    name='unique_ingredient_quantity')
+            models.UniqueConstraint(fields=['ingredients', 'quantity'],
+                                    name='unique_ingredients_quantity')
         ]
         ordering = ['id']
         verbose_name = 'Количество ингридиента'

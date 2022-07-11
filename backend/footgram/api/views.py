@@ -2,39 +2,72 @@
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from djoser.views import UserViewSet
-from django.db import IntegrityError
 from django.http import HttpResponse
 from django.db.models import Sum
+from rest_framework.permissions import AllowAny
 
 from .mixins import (
-    CustomListRetriveViewSet, CustomCreateDestroyViewSet, RecipeMixin
+    CustomListRetriveViewSet, RecipeMixin
 )
 from . import serializers
 from cooking import models
 from users.models import Follow
 from .pagination import ApiPagination
-
+from .viewset_exceptions import (
+    check_create, check_delete, check_follow_create, check_follow_delete
+)
 
 class RecipeViewSet(RecipeMixin):
     """Recipes viewsets."""
     pagination_class = ApiPagination
     queryset = models.Recipe.objects.all()
+    serializer_class = serializers.RecipeOutSerializer
+
+    @action(methods=["post", "delete"], detail=True)
+    def shopping_cart(self, requset, pk):
+        if requset.method == "POST":
+            return check_create(
+                pk=pk,
+                user=requset.user,
+                model=models.ShopList
+            )
+        if requset.method == "DELETE":
+            return check_delete(
+                pk=pk,
+                user=requset.user,
+                model=models.ShopList
+            )
+
+    @action(methods=["post", "delete"], detail=True)
+    def favorite(self, request, pk):
+        if request.method == "POST":
+            return check_create(
+                pk=pk,
+                user=request.user,
+                model=models.FavoriteRecipes
+            )
+        elif request.method == "DELETE":
+            return check_delete(
+                pk=pk,
+                user=request.user,
+                model=models.FavoriteRecipes
+            )
 
     @action(methods=["get"], detail=False)
     def download_shopping_cart(self, request):
         user = request.user
         ingredients = models.IngredientQuantity.objects.filter(
-            reciepe_ingredient__in=(user.shop_list_user.values('recipe_id'))
+            recipe_ingredients__in=(user.shop_list_user.values('recipe_id'))
         ).values(
-            "ingredient__name",
-            "ingredient__measurement"
+            "ingredients__name",
+            "ingredients__measurement"
         ).annotate(amount=Sum('quantity'))
         filename = f'{user.username}_shopping_list.txt'
         shopping_list = ["Список покупок:"]
         for ingredient in ingredients:
             shopping_list.append((
-                f'{ingredient.get("ingredient__name")} '
-                f'({ingredient.get("ingredient__measurement")}) — '
+                f'{ingredient.get("ingredients__name")} '
+                f'({ingredient.get("ingredients__measurement")}) — '
                 f'{ingredient.get("amount")}'
             ).capitalize())
         response = HttpResponse(
@@ -70,11 +103,6 @@ class RecipeViewSet(RecipeMixin):
         if self.action in ("partial_update",):
             return serializers.RecipeOutSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-        )
-
 
 class TagViewSet(CustomListRetriveViewSet):
     queryset = models.Tag.objects.all()
@@ -86,62 +114,31 @@ class IngredientViewset(CustomListRetriveViewSet):
     serializer_class = serializers.IngredientSerializer
 
 
-class FollowViewSet(CustomCreateDestroyViewSet):
-    serializer_class = serializers.FoodgramFollowSerializer
-    pagination_class = ApiPagination
-
-    def perform_create(self, serializer):
-        author = models.FoodgramUser.objects.get(id=self.kwargs.get("id"))
-        serializer.save(
-            author=author,
-            user=self.request.user
-        )
-
-    def create(self, request, *args, **kwargs):
-        try:
-            author = models.FoodgramUser.objects.get(id=self.kwargs.get('id'))
-            if author == request.user:
-                return Response(
-                    {"errors": "Вы не можете подписаться сами на себя!"},
-                    400
-                )
-            Follow.objects.create(user=request.user, author=author)
-            return Response(status=204)
-        except IntegrityError:
-            return Response(
-                {"errors": "Вы уже подписаны на этого автора!"}, 400
-            )
-        except models.FoodgramUser.DoesNotExist:
-            return Response({"detail": "Страница не найдена."}, status=404)
-
-    @action(methods=["delete"], detail=False)
-    def delete(self, request, id):
-        try:
-            models.FoodgramUser.objects.get(id=id)
-            Follow.objects.get(author_id=id, user_id=request.user).delete()
-            return Response(status=204)
-        except Follow.DoesNotExist:
-            return Response(
-                {"errors": "Вы не подписаны на данного автора."}, status=400
-            )
-        except models.FoodgramUser.DoesNotExist:
-            return Response({"detail": "Страница не найдена."}, status=404)
-
-
 class FoodgramUserViewSet(UserViewSet):
     """Вьюсет пользователей."""
     pagination_class = ApiPagination
+    permission_classes = (AllowAny,)
 
     def create(self, request, *args, **kwargs):
         serializer = serializers.FoodramRegisterInSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
+            user.set_password(user.password)
+            user.save()
             output_serializer = serializers.FoodgramRegisterOutSerializer(user)
             return Response(output_serializer.data)
         else:
             return Response(serializer.errors, 400)
+    
+    @action(methods=["post", "delete"], detail=True)
+    def subscribe(self, request, id):
+        if request.method == "POST":
+            return check_follow_create(pk=id, user=request.user, model=Follow)
+        if request.method == "DELETE":
+            return check_follow_delete(pk=id, user=request.user, model=Follow)
 
-    @action(methods=("get",), detail=False)
+
+    @action(methods=["get"], detail=True)
     def subscriptions(self, request):
         follows = Follow.objects.filter(user=request.user)
         list_of_authors = []
@@ -150,72 +147,3 @@ class FoodgramUserViewSet(UserViewSet):
                 serializers.FoodgramFollowSerializer(follow).data
             )
         return Response(list_of_authors, 200)
-
-
-class ShopingCardViewSet(CustomCreateDestroyViewSet):
-    serializer_class = serializers.RecipeShortSerializer
-    queryset = models.ShopList.objects.all()
-
-    def create(self, request, *args, **kwargs):
-        recipe = models.Recipe.objects.get(id=self.kwargs.get('recipe_id'))
-        try:
-            models.ShopList.objects.create(user=request.user, recipe=recipe)
-        except IntegrityError:
-            return Response(
-                {"errors": "Вы уже добавили товар в корзину!"}, 400
-            )
-        serializer = self.serializer_class(recipe)
-        return Response(serializer.data, 201)
-
-    @action(methods=["delete"], detail=False)
-    def delete(self, request, recipe_id):
-        try:
-            models.Recipe.objects.get(id=recipe_id)
-            models.ShopList.objects.get(
-                recipe_id=recipe_id, user=request.user
-            ).delete()
-            return Response(status=204)
-        except models.Recipe.DoesNotExist:
-            return Response(
-                {"errors": "Выбранного рецепта не существует!"}, 400
-            )
-        except models.ShopList.DoesNotExist:
-            return Response({"detail": "Страница не найдена."}, 404)
-
-
-class FavoriteRecipesViewSwt(CustomCreateDestroyViewSet):
-    serializer_class = serializers.RecipeShortSerializer
-
-    def get_queryset(self):
-        favorites = models.FavoriteRecipes.objects.filter(
-            user=self.request.user
-        )
-        return favorites
-
-    def create(self, request, *args, **kwargs):
-        recipe = models.Recipe.objects.get(id=self.kwargs.get('recipe_id'))
-        try:
-            models.FavoriteRecipes.objects.create(
-                user=request.user, recipe=recipe
-            )
-        except IntegrityError:
-            return Response(
-                {"errors": "Вы уже добавили товар в избранное!"}, 400
-            )
-        serializer = self.serializer_class(recipe)
-        return Response(serializer.data, 201)
-
-    @action(methods=["delete"], detail=False)
-    def delete(self, request, recipe_id):
-        try:
-            models.Recipe.objects.get(id=recipe_id)
-            models.FavoriteRecipes.objects.get(
-                recipe_id=recipe_id, user=request.user
-            ).delete()
-            return Response(status=204)
-        except models.Recipe.DoesNotExist:
-            return Response(
-                {"errors": "Выбранного рецепта не существует!"}, 400
-            )
-        except models.FavoriteRecipes.DoesNotExist:
-            return Response({"detail": "Страница не найдена."}, 404)
