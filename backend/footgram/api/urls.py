@@ -22,7 +22,7 @@ router.register(
 )
 router.register(
     r'^recipes/(?P<recipe_id>\d+)/favorite',
-    views.FavoriteRecipes,
+    views.FavoriteRecipesViewSwt,
     basename='shop_card'
 )
 

@@ -1,6 +1,5 @@
 """Serializers module for api app."""
 from rest_framework import serializers
-from rest_framework.pagination import LimitOffsetPagination
 
 from cooking import models
 from .fields import Base64ImageField
@@ -114,7 +113,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     """Resipe model POST/PATCH/DELETE requests serializer."""
     author = FoodgramUserSerializer(read_only=True)
     ingredient = IngredientAmountInSerializer(many=True)
-    current_time = serializers.IntegerField(source="time")
+    cooking_time = serializers.IntegerField(source="time")
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -130,7 +129,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name',
             'image',
             'text',
-            'current_time',
+            'cooking_time',
         )
 
     def create(self, validated_data):
@@ -230,6 +229,6 @@ class FoodgramFollowSerializer(serializers.Serializer):
 
     def get_recipes_count(self, obj):
         return obj.author.recipe_user.all().count()
-    
+
     def get_is_subscribed(self, obj):
-        return True 
+        return True
