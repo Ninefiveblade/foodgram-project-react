@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'colorfield',
     'rest_framework',
+    'django_filters',
     'rest_framework.authtoken',
     'djoser',
     'api.apps.ApiConfig',
@@ -153,4 +154,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-PAGE_SIZE = 6

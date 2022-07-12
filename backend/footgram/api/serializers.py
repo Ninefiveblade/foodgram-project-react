@@ -112,12 +112,16 @@ class FoodgramRegisterOutSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    """Resipe model POST/PATCH/DELETE requests serializer."""
+    """Recipe model POST/PATCH/DELETE requests serializer."""
     author = FoodgramUserSerializer(read_only=True)
     ingredients = IngredientAmountInSerializer(many=True)
     cooking_time = serializers.IntegerField(source="time")
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField(
+        method_name='get_is_favorited'
+    )
+    is_in_shopping_cart = serializers.SerializerMethodField(
+        method_name='get_is_in_shopping_cart'
+    )
 
     class Meta:
         model = models.Recipe
@@ -209,13 +213,17 @@ class FoodgramFollowSerializer(serializers.Serializer):
     username = serializers.ReadOnlyField(source='author.username')
     first_name = serializers.ReadOnlyField(source='author.first_name')
     last_name = serializers.ReadOnlyField(source='author.last_name')
-    is_subscribed = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField(
+        method_name='get_is_subscribed'
+    )
     recipes = RecipeShortSerializer(
         many=True,
         read_only=True,
         source="author.recipe_user"
     )
-    recipes_count = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField(
+        method_name='get_recipes_count'
+    )
 
     class Meta:
         model = Follow

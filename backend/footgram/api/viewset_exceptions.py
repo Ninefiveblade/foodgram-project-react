@@ -4,6 +4,7 @@ from django.db import IntegrityError
 from cooking import models
 from . import serializers
 
+
 def check_create(pk, model, user):
     try:
         recipe = models.Recipe.objects.get(id=pk)
@@ -20,6 +21,7 @@ def check_create(pk, model, user):
     serializer = serializers.RecipeShortSerializer(recipe)
     return Response(serializer.data, 201)
 
+
 def check_delete(pk, model, user):
     try:
         recipe = models.Recipe.objects.get(id=pk)
@@ -33,14 +35,15 @@ def check_delete(pk, model, user):
     except model.DoesNotExist:
         return Response({"detail": "Страница не найдена."}, 404)
 
+
 def check_follow_create(pk, model, user):
     try:
         author = models.FoodgramUser.objects.get(id=pk)
         if author == user:
             return Response(
                 {"errors": "Вы не можете подписаться сами на себя!"},
-                    400
-                )
+                400
+            )
         model.objects.create(user=user, author=author)
         return Response(status=204)
     except IntegrityError:
@@ -49,6 +52,7 @@ def check_follow_create(pk, model, user):
         )
     except models.FoodgramUser.DoesNotExist:
         return Response({"detail": "Страница не найдена."}, status=404)
+
 
 def check_follow_delete(pk, model, user):
     try:
@@ -61,4 +65,3 @@ def check_follow_delete(pk, model, user):
         )
     except models.FoodgramUser.DoesNotExist:
         return Response({"detail": "Страница не найдена."}, status=404)
-    

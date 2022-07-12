@@ -31,6 +31,7 @@ class Recipe(models.Model):
         help_text="Введите описание рецепта",
 
     )
+    pub_date = models.DateTimeField(auto_now_add=True)
     ingredients = models.ManyToManyField(
         "IngredientQuantity",
         verbose_name="Ингридиенты рецепта",
@@ -193,7 +194,9 @@ class IngredientQuantity(models.Model):
 
     def __str__(self):
         return (
-            f"{self.ingredients} {self.quantity} {self.ingredients.measurement}"
+            f"{self.ingredients} "
+            f"{self.quantity} "
+            f"{self.ingredients.measurement}"
         )
 
     class Meta:

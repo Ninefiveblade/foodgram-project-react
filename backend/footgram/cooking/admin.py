@@ -3,7 +3,14 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm
 from django import forms
 
-from .models import Recipe, Ingredient, Tag, FavoriteRecipes, ShopList, IngredientQuantity
+from .models import (
+    Recipe,
+    Ingredient,
+    Tag,
+    FavoriteRecipes,
+    ShopList,
+    IngredientQuantity
+)
 from users.models import FoodgramUser, Follow
 
 
@@ -36,40 +43,28 @@ class IngredientAdmin(admin.ModelAdmin):
     list_filter = ("name",)
 
 
-class FoodgramUserChangeForm(UserChangeForm):
-    class Meta(UserChangeForm.Meta):
-        model = FoodgramUser
-    
-    def clean_username(self):
-        username = self.cleaned_data['username']
-        try:
-            FoodgramUser.objects.get(username=username)
-        except FoodgramUser.DoesNotExist:
-            return username
-        raise forms.ValidationError(self.error_messages['duplicate_username'])
-
 class FoodgramUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets
     list_filter = ("first_name", "email")
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': (
-                'username',
-                'email',
-                'password1',
-                'password2',
-                'date_joined',
-                'user_permissions',
-                'first_name',
-                'last_name',
-                'is_superuser',
-                'is_staff',
-                'is_active',
-                'role',
-            )}
-            ),
-        )
+        (
+            None, {
+                'classes': ('wide',),
+                'fields': (
+                    'username',
+                    'email',
+                    'password1',
+                    'password2',
+                    'date_joined',
+                    'user_permissions',
+                    'first_name',
+                    'last_name',
+                    'is_superuser',
+                    'is_staff',
+                    'is_active',
+                    'role',)}
+        ),
+    )
 
 
 admin.site.register(Recipe, RecipeAdmin)

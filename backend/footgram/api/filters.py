@@ -1,21 +1,34 @@
 """Filters module for api app."""
 import django_filters as filters
-from cooking.models import Recipe
+from cooking.models import Recipe, Ingredient
 
 
 class RecipeFilter(filters.FilterSet):
     """Кастомный фильтр для вьюсета Recipe
-    поиск по полям genre, category."""
+    поиск по полям tags, category."""
     tags = filters.CharFilter(
         field_name='tags__slug',
         lookup_expr='icontains'
     )
     name = filters.CharFilter(field_name='name', lookup_expr='icontains')
+    author = filters.CharFilter(field_name='author_id')
 
     class Meta:
         model = Recipe
-        fields = ('name', 'genre', 'category', 'year')
+        fields = (
+            'author',
+            'tags'
+        )
 
 
 class IngredientFilter(filters.FilterSet):
-    pass
+    name = filters.CharFilter(
+        field_name='name',
+        lookup_expr='icontains'
+    )
+
+    class Meta:
+        model = Ingredient
+        fields = (
+            'name',
+        )
