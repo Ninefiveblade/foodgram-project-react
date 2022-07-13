@@ -1,6 +1,6 @@
 """Rout module for api app."""
 from django.urls import include, path
-from djoser.views import UserViewSet, TokenDestroyView, TokenCreateView
+from djoser.views import TokenCreateView, TokenDestroyView, UserViewSet
 from rest_framework import routers
 
 from . import views

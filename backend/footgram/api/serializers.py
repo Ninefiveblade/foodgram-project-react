@@ -1,10 +1,9 @@
 """Serializers module for api app."""
-from django.forms import ImageField
+from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
+from users.models import Follow, FoodgramUser
 from cooking import models
-from .fields import Base64ImageField
-from users.models import FoodgramUser, Follow
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -68,6 +67,7 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
     """FoodgramUser model serializer."""
     is_subscribed = serializers.SerializerMethodField()
 
+
     class Meta:
         model = FoodgramUser
         fields = (
@@ -118,7 +118,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = FoodgramUserSerializer(read_only=True)
     ingredients = IngredientAmountInSerializer(many=True)
     cooking_time = serializers.IntegerField(source="time")
-    image = ImageField()
+    image = Base64ImageField()
     is_favorited = serializers.SerializerMethodField(
         method_name='get_is_favorited'
     )
@@ -135,8 +135,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             'ingredients',
             'is_favorited',
             'is_in_shopping_cart',
-            'name',
             'image',
+            'name',
             'text',
             'cooking_time',
         )
@@ -151,7 +151,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                     **ingredient_data
                 )
             )
-            recipe.ingredient.add(ingredient)
+            recipe.ingredients.add(ingredient)
         for tag_data in tags:
             tag = models.Tag.objects.get(id=tag_data.id)
             recipe.tags.add(tag)
@@ -168,7 +168,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
             )
             ingredient_list.append(ingredient)
-        instance.ingredient.set(ingredient_list)
+        instance.ingredients.set(ingredient_list)
         instance.tags.set(tags)
         instance.text = validated_data.get('text', instance.text)
         instance.name = validated_data.get('name', instance.name)
@@ -193,7 +193,6 @@ class RecipeOutSerializer(RecipeSerializer):
     """Resipe model POST response/GET requests serializer."""
     ingredients = IngredientAmountOutSerializer(many=True)
     tags = TagSerializer(many=True)
-    image = Base64ImageField()
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):

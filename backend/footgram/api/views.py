@@ -1,32 +1,26 @@
 """Views module for api app."""
 from http import HTTPStatus
 
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from djoser.views import UserViewSet
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
-from .mixins import (
-    CustomListRetriveViewSet, RecipeMixin
-)
-from . import serializers
-from cooking import models
 from users.models import Follow
+from cooking import models
+from . import serializers
+from .filters import IngredientFilter, RecipeFilter
+from .mixins import CustomListRetriveViewSet, RecipeMixin
 from .pagination import ApiPagination
-from .utils import (
-    check_create,
-    check_delete,
-    check_follow_create,
-    check_follow_delete,
-    download
-)
-from .filters import RecipeFilter, IngredientFilter
 from .permissions import RecipeIsStaffOrOwner
+from .utils import (check_create, check_delete, check_follow_create,
+                    check_follow_delete, download)
 
 
 class RecipeViewSet(RecipeMixin):
     """Recipes viewsets."""
+
     pagination_class = ApiPagination
     queryset = models.Recipe.objects.all()
     serializer_class = serializers.RecipeOutSerializer
@@ -86,10 +80,15 @@ class RecipeViewSet(RecipeMixin):
         return download(self, request)
 
     def create(self, request, *args, **kwargs):
-        serializer = serializers.RecipeSerializer(data=request.data)
+        serializer = serializers.RecipeSerializer(
+            data=request.data,
+            context={"request": self.request}
+        )
         if serializer.is_valid(raise_exception=True):
             recipe = serializer.save(author=self.request.user)
-            output_serializer = serializers.RecipeOutSerializer(recipe)
+            output_serializer = serializers.RecipeOutSerializer(
+                recipe, context={"request": request}
+            )
             return Response(output_serializer.data)
         else:
             return Response(serializer.errors, HTTPStatus.BAD_REQUEST)
@@ -101,7 +100,9 @@ class RecipeViewSet(RecipeMixin):
         )
         if serializer.is_valid(raise_exception=True):
             recipe = serializer.save()
-            output_serializer = serializers.RecipeOutSerializer(recipe)
+            output_serializer = serializers.RecipeOutSerializer(
+                recipe, context={"request": request}
+            )
             return Response(output_serializer.data)
         else:
             return Response(serializer.errors, HTTPStatus.BAD_REQUEST)
@@ -114,6 +115,8 @@ class RecipeViewSet(RecipeMixin):
 
 
 class TagViewSet(CustomListRetriveViewSet):
+    """Tag viewset."""
+
     queryset = models.Tag.objects.all()
     serializer_class = serializers.TagSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -128,7 +131,8 @@ class IngredientViewset(CustomListRetriveViewSet):
 
 
 class FoodgramUserViewSet(UserViewSet):
-    """Вьюсет пользователей."""
+    """User viewset."""
+
     pagination_class = ApiPagination
 
     def create(self, request, *args, **kwargs):

@@ -1,6 +1,7 @@
 """Filters module for api app."""
 import django_filters as filters
-from cooking.models import Recipe, Ingredient
+
+from cooking.models import Ingredient, Recipe
 
 
 class RecipeFilter(filters.FilterSet):

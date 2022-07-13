@@ -1,16 +1,16 @@
 """Custom field module for api serializers module."""
 import base64
-import six
-import uuid
 import imghdr
+import uuid
 
-from rest_framework import serializers
+import six
 from django.core.files.base import ContentFile
+from rest_framework import serializers
 
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
-        print(data)
+        print(base64.b64decode(data))
         if isinstance(data, six.string_types):
             if 'data:' in data and ';base64,' in data:
                 header, data = data.split(';base64,')

@@ -1,15 +1,14 @@
-import os
 import json
-
-from tqdm import tqdm
-from django.core.management.base import BaseCommand
+import os
 
 from cooking import models
+from django.core.management.base import BaseCommand
+from tqdm import tqdm
 
 data = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath("data")))
 )
-
+print(data)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
