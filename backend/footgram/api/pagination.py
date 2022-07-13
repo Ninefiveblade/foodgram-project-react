@@ -1,5 +1,5 @@
 """Pagination module for api app."""
-from rest_framework.pagination import PageNumberPagination, LimitOffsetPagination
+from rest_framework.pagination import PageNumberPagination
 
 
 class ApiPagination(PageNumberPagination):
@@ -7,7 +7,3 @@ class ApiPagination(PageNumberPagination):
     page_size - страницы по умолчанию.
     """
     page_size_query_param = 'limit'
-
-
-class LolPagination(LimitOffsetPagination):
-    offset_query_param = 'recipes_limit'

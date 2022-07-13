@@ -118,6 +118,10 @@ AUTH_USER_MODEL = 'users.FoodgramUser'
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
+    'PERMISSIONS': {
+        'user': ('api.permissions.UserIsAuthentificated',),
+        'user_list': ('api.permissions.UserIsAuthentificated',),
+    },
     'SERIALIZERS': {
         'user': 'api.serializers.FoodgramUserSerializer',
         'user_list': 'api.serializers.FoodgramUserSerializer',

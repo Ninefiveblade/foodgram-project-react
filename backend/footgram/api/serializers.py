@@ -216,11 +216,7 @@ class FoodgramFollowSerializer(serializers.Serializer):
     is_subscribed = serializers.SerializerMethodField(
         method_name='get_is_subscribed'
     )
-    recipes = RecipeShortSerializer(
-        many=True,
-        read_only=True,
-        source="author.recipe_user"
-    )
+    recipes = serializers.SerializerMethodField(method_name='get_recipes')
     recipes_count = serializers.SerializerMethodField(
         method_name='get_recipes_count'
     )
@@ -243,6 +239,15 @@ class FoodgramFollowSerializer(serializers.Serializer):
 
     def get_recipes_count(self, obj):
         return obj.author.recipe_user.all().count()
+
+    def get_recipes(self, obj):
+        recipe_limit = self.context.get(
+            "request"
+        ).query_params.get("recipes_limit")
+        if recipe_limit is not None:
+            recipes = obj.author.recipe_user.all()[:int(recipe_limit)]
+            return RecipeShortSerializer(instance=recipes, many=True).data
+        return RecipeShortSerializer(instance=obj, many=True).data
 
     def get_is_subscribed(self, obj):
         return True

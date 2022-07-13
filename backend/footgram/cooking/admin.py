@@ -1,7 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.forms import UserChangeForm
-from django import forms
 
 from .models import (
     Recipe,
@@ -16,10 +14,14 @@ from users.models import FoodgramUser, Follow
 
 class RecipeAdmin(admin.ModelAdmin):
     """Настройка администрирования для Recipe"""
+
+    def favorites_count(self, obj):
+        return obj.favorite_recipe.all().count()
+
     list_display = (
         "name",
-        "author"
-
+        "author",
+        "favorites_count"
     )
     list_filter = ("name", "author", "tags")
 

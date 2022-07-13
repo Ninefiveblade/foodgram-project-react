@@ -2,7 +2,6 @@
 from django.urls import include, path
 from djoser.views import UserViewSet, TokenDestroyView, TokenCreateView
 from rest_framework import routers
-from rest_framework.authtoken import views
 
 from . import views
 
