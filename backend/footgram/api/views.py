@@ -1,9 +1,9 @@
 """Views module for api app."""
+from http import HTTPStatus
+
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from djoser.views import UserViewSet
-from django.http import HttpResponse
-from django.db.models import Sum
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -14,8 +14,12 @@ from . import serializers
 from cooking import models
 from users.models import Follow
 from .pagination import ApiPagination
-from .viewset_exceptions import (
-    check_create, check_delete, check_follow_create, check_follow_delete
+from .utils import (
+    check_create,
+    check_delete,
+    check_follow_create,
+    check_follow_delete,
+    download
 )
 from .filters import RecipeFilter, IngredientFilter
 from .permissions import RecipeIsStaffOrOwner
@@ -79,26 +83,7 @@ class RecipeViewSet(RecipeMixin):
 
     @action(methods=["get"], detail=False)
     def download_shopping_cart(self, request):
-        user = request.user
-        ingredients = models.IngredientQuantity.objects.filter(
-            recipe_ingredients__in=(user.shop_list_user.values('recipe_id'))
-        ).values(
-            "ingredients__name",
-            "ingredients__measurement"
-        ).annotate(amount=Sum('quantity'))
-        filename = f'{user.username}_shopping_list.txt'
-        shopping_list = ["Список покупок:"]
-        for ingredient in ingredients:
-            shopping_list.append((
-                f'{ingredient.get("ingredients__name")} '
-                f'({ingredient.get("ingredients__measurement")}) — '
-                f'{ingredient.get("amount")}'
-            ).capitalize())
-        response = HttpResponse(
-            "\n".join(shopping_list), content_type='text.txt; charset=utf-8'
-        )
-        response['Content-Disposition'] = f'attachment; filename={filename}'
-        return response
+        return download(self, request)
 
     def create(self, request, *args, **kwargs):
         serializer = serializers.RecipeSerializer(data=request.data)
@@ -107,7 +92,7 @@ class RecipeViewSet(RecipeMixin):
             output_serializer = serializers.RecipeOutSerializer(recipe)
             return Response(output_serializer.data)
         else:
-            return Response(serializer.errors, 400)
+            return Response(serializer.errors, HTTPStatus.BAD_REQUEST)
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -119,7 +104,7 @@ class RecipeViewSet(RecipeMixin):
             output_serializer = serializers.RecipeOutSerializer(recipe)
             return Response(output_serializer.data)
         else:
-            return Response(serializer.errors, 400)
+            return Response(serializer.errors, HTTPStatus.BAD_REQUEST)
 
     def get_serializer_class(self):
         if self.action in ("list", "retrieve",):
@@ -155,7 +140,7 @@ class FoodgramUserViewSet(UserViewSet):
             output_serializer = serializers.FoodgramRegisterOutSerializer(user)
             return Response(output_serializer.data)
         else:
-            return Response(serializer.errors, 400)
+            return Response(serializer.errors, HTTPStatus.BAD_REQUEST)
 
     @action(methods=["post", "delete"], detail=True)
     def subscribe(self, request, id):
