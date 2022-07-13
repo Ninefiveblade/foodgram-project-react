@@ -1,4 +1,5 @@
 """Serializers module for api app."""
+from django.forms import ImageField
 from rest_framework import serializers
 
 from cooking import models
@@ -86,6 +87,7 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
 
 
 class FoodramRegisterInSerializer(serializers.ModelSerializer):
+    """Foodram Rerister input serializer."""
     class Meta:
         model = FoodgramUser
         fields = (
@@ -99,7 +101,7 @@ class FoodramRegisterInSerializer(serializers.ModelSerializer):
 
 
 class FoodgramRegisterOutSerializer(serializers.ModelSerializer):
-    """FoodgramUser model serializer."""
+    """Foodram Rerister out serializer."""
     class Meta:
         model = FoodgramUser
         fields = (
@@ -116,6 +118,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = FoodgramUserSerializer(read_only=True)
     ingredients = IngredientAmountInSerializer(many=True)
     cooking_time = serializers.IntegerField(source="time")
+    image = ImageField()
     is_favorited = serializers.SerializerMethodField(
         method_name='get_is_favorited'
     )
