@@ -1,3 +1,4 @@
+"""Utils help module for ViewSets."""
 from http import HTTPStatus
 
 from django.db import IntegrityError
