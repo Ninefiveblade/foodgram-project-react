@@ -1,3 +1,4 @@
+"""Command module for Foodgram project database."""
 import json
 import os
 
@@ -9,6 +10,8 @@ data = os.path.abspath("data")
 
 
 class Command(BaseCommand):
+    """Comand for deploy data to database."""
+
     def handle(self, *args, **options):
         models.Ingredient.objects.all().delete()
         with open(f"{data}/ingredients.json", "r") as j:

@@ -31,15 +31,15 @@ class RecipeViewSet(RecipeMixin):
     def get_queryset(self):
         user = self.request.user
         queryset = models.Recipe.objects.all()
-        is_favorited = self.request.query_params.get('is_favorited')
+        is_favorited = self.request.query_params.get("is_favorited")
         is_in_shopping_cart = self.request.query_params.get(
-            'is_in_shopping_cart'
+            "is_in_shopping_cart"
         )
         if is_favorited is not None:
             queryset = queryset.filter(favorite_recipe__user=user)
         if is_in_shopping_cart is not None:
             queryset = queryset.filter(shop_recipe__user=user)
-        return queryset.order_by('-pub_date')
+        return queryset.order_by("-pub_date")
 
     @action(
         methods=["post", "delete"], detail=True

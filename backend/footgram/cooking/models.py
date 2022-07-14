@@ -1,4 +1,4 @@
-"""Модели приложения cooking."""
+"""Cooking app models."""
 from colorfield.fields import ColorField
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -6,7 +6,8 @@ from users.models import FoodgramUser
 
 
 class Recipe(models.Model):
-    """Модель рецепта."""
+    """Recipe model"""
+
     author: FoodgramUser = models.ForeignKey(
         FoodgramUser,
         verbose_name="Автор рецепта",
@@ -61,7 +62,8 @@ class Recipe(models.Model):
 
 
 class Tag(models.Model):
-    """Модель тега."""
+    """Tag model."""
+
     COLOR_PALETTE = [
         ("#E26C2D", "Оранжевый", ),
         ("#228b22", "Зеленый", ),
@@ -94,13 +96,14 @@ class Tag(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['id']
-        verbose_name = 'Тег'
-        verbose_name_plural = 'Тэги'
+        ordering = ["id"]
+        verbose_name = "Тег"
+        verbose_name_plural = "Тэги"
 
 
 class Ingredient(models.Model):
-    """Модель ингридиента."""
+    """Ingredient model."""
+
     name: str = models.CharField(
         verbose_name="Название ингредиента",
         help_text="Введите название ингридиента",
@@ -118,20 +121,21 @@ class Ingredient(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['id']
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
+        ordering = ["id"]
+        verbose_name = "Ингридиент"
+        verbose_name_plural = "Ингридиенты"
 
 
 class FavoriteRecipes(models.Model):
-    """Модель избранного."""
-    user = models.ForeignKey(
+    """Favorite recipes model."""
+
+    user: FoodgramUser = models.ForeignKey(
         FoodgramUser,
         verbose_name="Пользователь избранных рецептов",
         related_name="favorite_list_user",
         on_delete=models.CASCADE
     )
-    recipe = models.ForeignKey(
+    recipe: Recipe = models.ForeignKey(
         "Recipe",
         verbose_name="Избранный рецепт",
         related_name="favorite_recipe",
@@ -140,28 +144,33 @@ class FavoriteRecipes(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user_id', 'recipe_id'],
-                                    name='unique_favorites')
+            models.UniqueConstraint(fields=["user_id", "recipe_id"],
+                                    name="unique_favorites")
         ]
-        ordering = ['id']
-        verbose_name = 'Избранный рецепт'
-        verbose_name_plural = 'Избранные рецепты'
+        ordering = ["id"]
+        verbose_name = "Избранный рецепт"
+        verbose_name_plural = "Избранные рецепты"
 
 
 class ShopList(models.Model):
-    """Модель покупок."""
-    user = models.ForeignKey(
+    """Shop basket model."""
+
+    user: FoodgramUser = models.ForeignKey(
         FoodgramUser,
         verbose_name="Пользователь избранных рецептов",
         related_name="shop_list_user",
         on_delete=models.CASCADE
     )
-    recipe = models.ForeignKey(
+    recipe: Recipe = models.ForeignKey(
         "Recipe",
         verbose_name="Избранный рецепт",
         related_name="shop_recipe",
         on_delete=models.CASCADE
     )
+
+    def __str__(self) -> str:
+        return (f"Покупки пользователя {self.user.username}, "
+                f"c рецептом {self.recipe.name}")
 
     class Meta:
         constraints = [
@@ -174,7 +183,9 @@ class ShopList(models.Model):
 
 
 class IngredientQuantity(models.Model):
-    ingredients = models.ForeignKey(
+    """Amount Ingredient model."""
+
+    ingredients: Ingredient = models.ForeignKey(
         Ingredient,
         verbose_name="Ингридиент",
         related_name="ingredients_amount",
@@ -200,8 +211,8 @@ class IngredientQuantity(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['ingredients', 'quantity'],
-                                    name='unique_ingredients_quantity')
+            models.UniqueConstraint(fields=["ingredients", "quantity"],
+                                    name="unique_ingredients_quantity")
         ]
         ordering = ['id']
         verbose_name = 'Количество ингридиента'

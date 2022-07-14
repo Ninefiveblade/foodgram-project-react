@@ -3,7 +3,6 @@ from rest_framework.pagination import PageNumberPagination
 
 
 class ApiPagination(PageNumberPagination):
-    """Кастомный класс пагинации.
-    page_size - страницы по умолчанию.
+    """Custom pagination for all project
     """
     page_size_query_param = 'limit'

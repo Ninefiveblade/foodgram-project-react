@@ -87,12 +87,12 @@ def check_follow_delete(pk, model, user):
 def download(self, request):
     user = request.user
     ingredients = models.IngredientQuantity.objects.filter(
-        recipe_ingredients__in=(user.shop_list_user.values('recipe_id'))
+        recipe_ingredients__in=(user.shop_list_user.values("recipe_id"))
     ).values(
         "ingredients__name",
         "ingredients__measurement"
     ).annotate(amount=Sum('quantity'))
-    filename = f'{user.username}_shopping_list.txt'
+    filename = f"{user.username}_shopping_list.txt"
     shopping_list = ["Список покупок:"]
     for ingredient in ingredients:
         shopping_list.append((
@@ -101,7 +101,7 @@ def download(self, request):
             f'{ingredient.get("amount")}'
         ).capitalize())
     response = HttpResponse(
-        "\n".join(shopping_list), content_type='text.txt; charset=utf-8'
+        "\n".join(shopping_list), content_type="text.txt; charset=utf-8"
     )
-    response['Content-Disposition'] = f'attachment; filename={filename}'
+    response["Content-Disposition"] = f"attachment; filename={filename}"
     return response

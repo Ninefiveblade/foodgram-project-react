@@ -3,13 +3,11 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class RecipeIsStaffOrOwner(BasePermission):
-    """Пермишен доступа персонала и пользователя.
-    Переопределенные методы:
-    Общий -has_permission
-    Объектный - has_object_permission.
+    """Custom Permission for RecipeViewSet
     """
+
     def has_permission(self, request, view):
-        if view.action == 'download_shopping_cart':
+        if view.action == "download_shopping_cart":
             return request.user.is_authenticated
         return (
             request.method in SAFE_METHODS
@@ -27,8 +25,9 @@ class RecipeIsStaffOrOwner(BasePermission):
 
 
 class UserIsAuthentificated(BasePermission):
+    """Custom permission for User/Follow"""
 
     def has_permission(self, request, view):
-        if view.action == 'list':
+        if view.action == "list":
             return (request.user.is_authenticated or request.user)
         return request.user.is_authenticated

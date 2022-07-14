@@ -8,35 +8,38 @@ from cooking import models
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Ingredient model serializer."""
+
     measurement_unit = serializers.ReadOnlyField(source="measurement")
 
     class Meta:
         model = models.Ingredient
         fields = (
-            'id',
-            'name',
-            'measurement_unit'
+            "id",
+            "name",
+            "measurement_unit"
         )
 
 
 class IngredientAmountInSerializer(serializers.ModelSerializer):
     """IngredientQuantity models serializer."""
+
     id = serializers.PrimaryKeyRelatedField(
         source='ingredients',
         queryset=models.Ingredient.objects.all()
     )
-    amount = serializers.IntegerField(source='quantity')
+    amount = serializers.IntegerField(source="quantity")
 
     class Meta:
         model = models.IngredientQuantity
         fields = (
-            'id',
-            'amount',
+            "id",
+            "amount",
         )
 
 
 class IngredientAmountOutSerializer(serializers.ModelSerializer):
     """IngredientQuantity model serializer for GET requests."""
+
     id = serializers.ReadOnlyField(source="ingredients.id")
     name = serializers.ReadOnlyField(source="ingredients.name")
     amount = serializers.ReadOnlyField(source="quantity")
@@ -47,35 +50,37 @@ class IngredientAmountOutSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.IngredientQuantity
         fields = (
-            'id',
-            'name',
-            'measurement_unit',
-            'amount',
+            "id",
+            "name",
+            "measurement_unit",
+            "amount",
         )
 
 
 class TagSerializer(serializers.ModelSerializer):
     """Tag model serializer."""
+
     class Meta:
         model = models.Tag
         fields = (
-            'id', 'name', 'color', 'slug'
+            "id", "name", "color", "slug"
         )
 
 
 class FoodgramUserSerializer(serializers.ModelSerializer):
     """FoodgramUser model serializer."""
+
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
         model = FoodgramUser
         fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed'
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "is_subscribed"
         )
 
     def get_is_subscribed(self, obj):
@@ -87,57 +92,60 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
 
 class FoodramRegisterInSerializer(serializers.ModelSerializer):
     """Foodram Rerister input serializer."""
+
     class Meta:
         model = FoodgramUser
         fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'password'
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "password"
         )
 
 
 class FoodgramRegisterOutSerializer(serializers.ModelSerializer):
     """Foodram Rerister out serializer."""
+
     class Meta:
         model = FoodgramUser
         fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
         )
 
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Recipe model POST/PATCH/DELETE requests serializer."""
+
     author = FoodgramUserSerializer(read_only=True)
     ingredients = IngredientAmountInSerializer(many=True)
     cooking_time = serializers.IntegerField(source="time")
     image = Base64ImageField()
     is_favorited = serializers.SerializerMethodField(
-        method_name='get_is_favorited'
+        method_name="get_is_favorited"
     )
     is_in_shopping_cart = serializers.SerializerMethodField(
-        method_name='get_is_in_shopping_cart'
+        method_name="get_is_in_shopping_cart"
     )
 
     class Meta:
         model = models.Recipe
         fields = (
-            'id',
-            'tags',
-            'author',
-            'ingredients',
-            'is_favorited',
-            'is_in_shopping_cart',
-            'image',
-            'name',
-            'text',
-            'cooking_time',
+            "id",
+            "tags",
+            "author",
+            "ingredients",
+            "is_favorited",
+            "is_in_shopping_cart",
+            "image",
+            "name",
+            "text",
+            "cooking_time",
         )
 
     def create(self, validated_data):
@@ -157,8 +165,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         return recipe
 
     def update(self, instance, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        tags = validated_data.pop('tags')
+        ingredients = validated_data.pop("ingredients")
+        tags = validated_data.pop("tags")
         ingredient_list = []
         for ingredient_data in ingredients:
             ingredient, bool = (
@@ -170,10 +178,10 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         instance.ingredients.set(ingredient_list)
         instance.tags.set(tags)
-        instance.text = validated_data.get('text', instance.text)
-        instance.name = validated_data.get('name', instance.name)
-        instance.time = validated_data.get('time', instance.time)
-        instance.image = validated_data.get('image', instance.image)
+        instance.text = validated_data.get("text", instance.text)
+        instance.name = validated_data.get("name", instance.name)
+        instance.time = validated_data.get("time", instance.time)
+        instance.image = validated_data.get("image", instance.image)
         instance.save()
         return instance
 
@@ -192,12 +200,14 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 class RecipeOutSerializer(RecipeSerializer):
     """Resipe model POST response/GET requests serializer."""
+
     ingredients = IngredientAmountOutSerializer(many=True)
     tags = TagSerializer(many=True)
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):
     """Short recipe serializer."""
+
     cooking_time = serializers.IntegerField(source="time")
 
     class Meta:
@@ -211,30 +221,32 @@ class RecipeShortSerializer(serializers.ModelSerializer):
 
 
 class FoodgramFollowSerializer(serializers.Serializer):
-    email = serializers.ReadOnlyField(source='author.email')
-    id = serializers.ReadOnlyField(source='author.id')
-    username = serializers.ReadOnlyField(source='author.username')
-    first_name = serializers.ReadOnlyField(source='author.first_name')
-    last_name = serializers.ReadOnlyField(source='author.last_name')
+    """Follow serializer."""
+
+    email = serializers.ReadOnlyField(source="author.email")
+    id = serializers.ReadOnlyField(source="author.id")
+    username = serializers.ReadOnlyField(source="author.username")
+    first_name = serializers.ReadOnlyField(source="author.first_name")
+    last_name = serializers.ReadOnlyField(source="author.last_name")
     is_subscribed = serializers.SerializerMethodField(
-        method_name='get_is_subscribed'
+        method_name="get_is_subscribed"
     )
-    recipes = serializers.SerializerMethodField(method_name='get_recipes')
+    recipes = serializers.SerializerMethodField(method_name="get_recipes")
     recipes_count = serializers.SerializerMethodField(
-        method_name='get_recipes_count'
+        method_name="get_recipes_count"
     )
 
     class Meta:
         model = Follow
         fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-            'recipes',
-            'recipes_count'
+            "email",
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "is_subscribed",
+            "recipes",
+            "recipes_count"
         )
 
     def create(self, validated_data):
