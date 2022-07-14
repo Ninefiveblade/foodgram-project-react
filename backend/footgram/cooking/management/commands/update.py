@@ -5,15 +5,13 @@ from cooking import models
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
-data = os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.abspath("data")))
-)
-print(data)
+data = os.path.abspath("data")
+
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         models.Ingredient.objects.all().delete()
-        with open(f"{data}/data/ingredients.json", "r") as j:
+        with open(f"{data}/ingredients.json", "r") as j:
             data_dict = json.loads(j.read())
             count = 0
             try:

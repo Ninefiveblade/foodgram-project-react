@@ -8,14 +8,14 @@ from cooking import models
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Ingredient model serializer."""
-    measurment_unit = serializers.ReadOnlyField(source="measurement")
+    measurement_unit = serializers.ReadOnlyField(source="measurement")
 
     class Meta:
         model = models.Ingredient
         fields = (
             'id',
             'name',
-            'measurment_unit'
+            'measurement_unit'
         )
 
 
@@ -40,7 +40,7 @@ class IngredientAmountOutSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source="ingredients.id")
     name = serializers.ReadOnlyField(source="ingredients.name")
     amount = serializers.ReadOnlyField(source="quantity")
-    measurment_unit = serializers.ReadOnlyField(
+    measurement_unit = serializers.ReadOnlyField(
         source="ingredients.measurement"
     )
 
@@ -49,7 +49,7 @@ class IngredientAmountOutSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
-            'measurment_unit',
+            'measurement_unit',
             'amount',
         )
 
@@ -66,7 +66,6 @@ class TagSerializer(serializers.ModelSerializer):
 class FoodgramUserSerializer(serializers.ModelSerializer):
     """FoodgramUser model serializer."""
     is_subscribed = serializers.SerializerMethodField()
-
 
     class Meta:
         model = FoodgramUser
@@ -168,12 +167,14 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
             )
             ingredient_list.append(ingredient)
+
         instance.ingredients.set(ingredient_list)
         instance.tags.set(tags)
         instance.text = validated_data.get('text', instance.text)
         instance.name = validated_data.get('name', instance.name)
         instance.time = validated_data.get('time', instance.time)
         instance.image = validated_data.get('image', instance.image)
+        instance.save()
         return instance
 
     def get_is_favorited(self, obj):
