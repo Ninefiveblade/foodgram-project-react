@@ -37,8 +37,8 @@ DB_PORT=5432
 
 ## Выполнить миграции:
 
-```docker-compose exec web python manage.py makemigrations```
-```docker-compose exec web python manage.py migrate```
+```docker-compose exec backend python manage.py makemigrations```
+```docker-compose exec backend python manage.py migrate```
 
 ## Создать суперпользователя:
 
