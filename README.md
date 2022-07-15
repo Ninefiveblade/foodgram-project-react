@@ -31,12 +31,6 @@ DB_PORT=5432
 
 ```http://foodfound.myvnc.com/recipes```
 
-## Запуск тестов:
-
-#### Из корневой папки проета:
-
-```pytest```
-
 ## Запустить проект:
 
 ```your_path/infra/docker-compose up -d```
