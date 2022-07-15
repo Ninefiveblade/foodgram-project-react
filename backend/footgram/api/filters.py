@@ -10,10 +10,13 @@ class RecipeFilter(filters.FilterSet):
 
     tags = filters.CharFilter(
         field_name="tags__slug",
-        lookup_expr="icontains"
+        method='filter_tags'
     )
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
     author = filters.CharFilter(field_name="author_id")
+
+    def filter_tags(self, queryset, slug, tags):
+        return queryset.filter(tags__slug__contains=tags.split(','))
 
     class Meta:
         model = Recipe
