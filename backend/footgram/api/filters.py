@@ -14,7 +14,6 @@ class RecipeFilter(filters.FilterSet):
     )
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
     author = filters.CharFilter(field_name="author_id")
-    
 
     class Meta:
         model = Recipe
