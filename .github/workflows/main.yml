@@ -62,6 +62,7 @@ jobs:
             cd project/
             sudo docker-compose stop
             sudo docker-compose rm backend
+            sudo docker-compose rm frontend
             sudo docker-compose up -d
             sudo docker-compose exec -T web python manage.py makemigrations
             sudo docker-compose exec -T web python manage.py migrate
