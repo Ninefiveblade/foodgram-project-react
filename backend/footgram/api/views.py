@@ -4,6 +4,7 @@ from http import HTTPStatus
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from users.models import Follow
@@ -118,6 +119,7 @@ class TagViewSet(CustomListRetriveViewSet):
 
     queryset = models.Tag.objects.all()
     serializer_class = serializers.TagSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 class IngredientViewset(CustomListRetriveViewSet):
@@ -125,6 +127,7 @@ class IngredientViewset(CustomListRetriveViewSet):
     serializer_class = serializers.IngredientSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = IngredientFilter
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 
 class FoodgramUserViewSet(UserViewSet):

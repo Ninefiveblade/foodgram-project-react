@@ -10,7 +10,7 @@ class RecipeFilter(filters.FilterSet):
 
     tags = filters.CharFilter(
         field_name="tags__slug",
-        lookup_expr="icontains"
+        lookup_expr="exact"
     )
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
     author = filters.CharFilter(field_name="author_id")
