@@ -1,5 +1,6 @@
-FROM python:3.9
+FROM python:3.7-slim
 COPY . ./app
 COPY ../data ./app/footgram/data
 WORKDIR /app/footgram
 RUN pip3 install -r ../requirements.txt --no-cache-dir
+LABEL author="Alexeev Ivan"
