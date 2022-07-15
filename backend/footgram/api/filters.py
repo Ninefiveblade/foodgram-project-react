@@ -16,7 +16,7 @@ class RecipeFilter(filters.FilterSet):
     author = filters.CharFilter(field_name="author_id")
 
     def filter_tags(self, queryset, slug, tags):
-        return queryset.filter(tags__slug__contains=tags.split(','))
+        return queryset.filter(tags__slug__icontains=tags.split(','))
 
     class Meta:
         model = Recipe
