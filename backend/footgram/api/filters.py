@@ -8,9 +8,8 @@ class RecipeFilter(filters.FilterSet):
     """Custom filterset for Recipe
     search by tags, name, author."""
 
-    tags = filters.CharFilter(
+    tags = filters.AllValuesMultipleFilter(
         field_name="tags__slug",
-        method='contains'
     )
     name = filters.CharFilter(field_name="name", lookup_expr="icontains")
     author = filters.CharFilter(field_name="author_id")
