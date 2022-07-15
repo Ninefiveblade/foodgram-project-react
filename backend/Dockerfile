@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.9
 COPY . ./app
 COPY ../data ./app/footgram/data
 WORKDIR /app/footgram

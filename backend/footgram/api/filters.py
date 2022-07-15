@@ -8,17 +8,13 @@ class RecipeFilter(filters.FilterSet):
     """Custom filterset for Recipe
     search by tags, name, author."""
 
-    tags = filters.AllValuesMultipleFilter(
-        field_name="tags__slug",
-    )
-    name = filters.CharFilter(field_name="name", lookup_expr="icontains")
+    tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
     author = filters.CharFilter(field_name="author_id")
 
     class Meta:
         model = Recipe
         fields = (
             "author",
-            "tags"
         )
 
 
