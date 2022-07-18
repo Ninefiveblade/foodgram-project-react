@@ -110,7 +110,7 @@ class FoodramRegisterSerializer(serializers.ModelSerializer):
 
     def validate_username(self, username):
         if not username.isalpha():
-            raise ValidationError('Имя должно иметь только буквы')
+            raise ValidationError('Имя должно иметь только буквы!')
         return username.lower()
 
 
@@ -154,9 +154,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
             )
             recipe.ingredients.add(ingredient)
-        for tag_data in tags:
-            tag = models.Tag.objects.get(id=tag_data.id)
-            recipe.tags.add(tag)
+        recipe.tags.set(tags)
         return recipe
 
     def update(self, instance, validated_data):
@@ -170,7 +168,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
             )
             ingredient_list.append(ingredient)
-
         instance.ingredients.set(ingredient_list)
         instance.tags.set(tags)
         return super().update(instance, validated_data)
@@ -202,20 +199,6 @@ class RecipeShortSerializer(serializers.ModelSerializer):
             "image",
             "cooking_time"
         )
-
-
-class FoodgramFollowInSerialier(serializers.Serializer):
-
-    class Meta:
-        model = Follow
-        fields = (
-            "author",
-            "user"
-        )
-
-    def create(self, validated_data):
-        print(validated_data)
-        return super().create(validated_data)
 
 
 class FoodgramFollowSerializer(serializers.Serializer):

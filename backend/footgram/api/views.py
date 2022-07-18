@@ -51,12 +51,11 @@ class RecipeViewSet(RecipeMixin):
                 user=requset.user,
                 model=models.ShopList
             )
-        if requset.method == "DELETE":
-            return check_delete(
-                pk=pk,
-                user=requset.user,
-                model=models.ShopList
-            )
+        return check_delete(
+            pk=pk,
+            user=requset.user,
+            model=models.ShopList
+        )
 
     @action(
         methods=["post", "delete"], detail=True
@@ -68,12 +67,11 @@ class RecipeViewSet(RecipeMixin):
                 user=request.user,
                 model=models.FavoriteRecipes
             )
-        elif request.method == "DELETE":
-            return check_delete(
-                pk=pk,
-                user=request.user,
-                model=models.FavoriteRecipes
-            )
+        return check_delete(
+            pk=pk,
+            user=request.user,
+            model=models.FavoriteRecipes
+        )
 
     @action(
         methods=["get"],
@@ -151,17 +149,9 @@ class FoodgramUserViewSet(UserViewSet):
 
     @action(methods=["post", "delete"], detail=True)
     def subscribe(self, request, id):
-        """data = {}
-        data["author"] = models.FoodgramUser.objects.get(id=id)
-        data["user"] = request.user
-        print(self.queryset)
-        serializer = serializers.FoodgramFollowInSerialier(instance=self.queryset, data=data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()"""
         if request.method == "POST":
             return check_follow_create(pk=id, user=request.user, model=Follow)
-        if request.method == "DELETE":
-            return check_follow_delete(pk=id, user=request.user, model=Follow)
+        return check_follow_delete(pk=id, user=request.user, model=Follow)
 
     @action(
         methods=["get"], detail=False, permission_classes=[IsAuthenticated, ]

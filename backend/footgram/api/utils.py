@@ -35,16 +35,12 @@ def check_follow_create(pk, model, user):
     """Create follow optimization."""
     try:
         author = get_object_or_404(models.FoodgramUser, id=pk)
-        if author == user:
-            return Response(
-                {"errors": "Вы не можете подписаться сами на себя!"},
-                HTTPStatus.BAD_REQUEST
-            )
         model.objects.create(user=user, author=author)
         return Response(status=HTTPStatus.NO_CONTENT)
     except IntegrityError:
         return Response(
-            {"errors": "Вы уже подписаны на этого автора!"},
+            {"errors": ("Вы не можете подписаться на "
+                        "автора еще раз или сами на себя!")},
             HTTPStatus.BAD_REQUEST
         )
 
