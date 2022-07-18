@@ -44,7 +44,9 @@ class Recipe(models.Model):
         verbose_name="Время приготовления в минутах",
         help_text="Введите время приготовления в минутах",
         validators=[
-            MinValueValidator(1)
+            MinValueValidator(
+                1,
+                message="Время не может занимать меньше минуты!")
         ],
     )
     tags = models.ManyToManyField(
@@ -197,7 +199,10 @@ class IngredientQuantity(models.Model):
         verbose_name="Количество ингридиента",
         help_text="Введите количество ингридиента",
         validators=[
-            MinValueValidator(1)
+            MinValueValidator(
+                1,
+                message="Количество не может быть меньше 1!"
+            )
         ],
         null=True,
         blank=False

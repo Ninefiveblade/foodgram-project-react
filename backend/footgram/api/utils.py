@@ -4,6 +4,7 @@ from http import HTTPStatus
 from django.db import IntegrityError
 from django.db.models import Sum
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
 from cooking import models
@@ -11,13 +12,8 @@ from . import serializers
 
 
 def check_create(pk, model, user):
-    try:
-        recipe = models.Recipe.objects.get(id=pk)
-    except models.Recipe.DoesNotExist:
-        return Response(
-            {"errors": "Выбранного рецепта не существует!"},
-            HTTPStatus.BAD_REQUEST
-        )
+    """Shop/Favorite recipe create optimization."""
+    recipe = get_object_or_404(models.Recipe, id=pk)
     try:
         model.objects.create(user=user, recipe=recipe)
     except IntegrityError:
@@ -29,26 +25,21 @@ def check_create(pk, model, user):
 
 
 def check_delete(pk, model, user):
-    try:
-        recipe = models.Recipe.objects.get(id=pk)
-    except models.Recipe.DoesNotExist:
-        return Response(
-            {"errors": "Выбранного рецепта не существует!"},
-            HTTPStatus.BAD_REQUEST
-        )
-    try:
-        model.objects.get(recipe_id=recipe.id, user=user).delete()
-        return Response(status=HTTPStatus.NO_CONTENT)
-    except model.DoesNotExist:
-        return Response(
-            {"detail": "Страница не найдена."},
-            HTTPStatus.NOT_FOUND
-        )
+    """Shop/Favorite recipe delete optimization."""
+    recipe = get_object_or_404(models.Recipe, id=pk)
+    get_object_or_404(model, recipe_id=recipe.id, user=user).delete()
+    return Response(status=HTTPStatus.NO_CONTENT)
 
 
 def check_follow_create(pk, model, user):
+    """Create follow optimization."""
     try:
-        author = models.FoodgramUser.objects.get(id=pk)
+        author = get_object_or_404(models.FoodgramUser, id=pk)
+        if author == user:
+            return Response(
+                {"errors": "Вы не можете подписаться сами на себя!"},
+                HTTPStatus.BAD_REQUEST
+            )
         model.objects.create(user=user, author=author)
         return Response(status=HTTPStatus.NO_CONTENT)
     except IntegrityError:
@@ -56,16 +47,12 @@ def check_follow_create(pk, model, user):
             {"errors": "Вы уже подписаны на этого автора!"},
             HTTPStatus.BAD_REQUEST
         )
-    except models.FoodgramUser.DoesNotExist:
-        return Response(
-            {"detail": "Страница не найдена."},
-            HTTPStatus.NOT_FOUND
-        )
 
 
 def check_follow_delete(pk, model, user):
+    """Delete follow optimization."""
     try:
-        models.FoodgramUser.objects.get(id=pk)
+        get_object_or_404(models.FoodgramUser, id=pk)
         model.objects.get(author_id=pk, user_id=user.id).delete()
         return Response(status=HTTPStatus.NO_CONTENT)
     except model.DoesNotExist:
@@ -73,14 +60,21 @@ def check_follow_delete(pk, model, user):
             {"errors": "Вы не подписаны на данного автора."},
             HTTPStatus.BAD_REQUEST
         )
-    except models.FoodgramUser.DoesNotExist:
-        return Response(
-            {"detail": "Страница не найдена."},
-            HTTPStatus.NOT_FOUND
-        )
+
+
+def get_additional_field(self, obj_related):
+    """Get additional SerializerField optimzation."""
+    try:
+        user = self.context.get("request").user
+        if user.is_anonymous:
+            return False
+        return obj_related.filter(user=user).exists()
+    except Exception:
+        return False
 
 
 def download(self, request):
+    """Download shopping card."""
     user = request.user
     ingredients = models.IngredientQuantity.objects.filter(
         recipe_ingredients__in=(user.shop_list_user.values("recipe_id"))

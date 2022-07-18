@@ -8,7 +8,7 @@ class RecipeIsStaffOrOwner(BasePermission):
 
     def has_permission(self, request, view):
         return (
-            request.user.is_authenticated 
+            request.user.is_authenticated
             or request.method in SAFE_METHODS
         )
 
@@ -26,6 +26,7 @@ class UserIsAuthentificated(BasePermission):
     """Custom permission for User/Follow"""
 
     def has_permission(self, request, view):
-        if view.action == "list":
-            return (request.user.is_authenticated or request.user)
-        return request.user.is_authenticated
+        return (
+            request.user.is_authenticated
+            or request.method in SAFE_METHODS
+        )

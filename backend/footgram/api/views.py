@@ -78,7 +78,7 @@ class RecipeViewSet(RecipeMixin):
     @action(
         methods=["get"],
         detail=False,
-        permission_classes=[IsAuthenticated,]
+        permission_classes=[IsAuthenticated, ]
     )
     def download_shopping_cart(self, request):
         return download(self, request)
@@ -140,26 +140,32 @@ class FoodgramUserViewSet(UserViewSet):
     pagination_class = ApiPagination
 
     def create(self, request, *args, **kwargs):
-        serializer = serializers.FoodramRegisterInSerializer(data=request.data)
+        serializer = serializers.FoodramRegisterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             user.set_password(user.password)
             user.save()
-            output_serializer = serializers.FoodgramRegisterOutSerializer(user)
-            return Response(output_serializer.data)
+            return Response(serializer.data)
         else:
             return Response(serializer.errors, HTTPStatus.BAD_REQUEST)
 
     @action(methods=["post", "delete"], detail=True)
     def subscribe(self, request, id):
+        """data = {}
+        data["author"] = models.FoodgramUser.objects.get(id=id)
+        data["user"] = request.user
+        print(self.queryset)
+        serializer = serializers.FoodgramFollowInSerialier(instance=self.queryset, data=data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()"""
         if request.method == "POST":
-            serializer = serializers.FoodgramFollowSerializer(self.queryset)
-            print(serializer)
             return check_follow_create(pk=id, user=request.user, model=Follow)
         if request.method == "DELETE":
             return check_follow_delete(pk=id, user=request.user, model=Follow)
 
-    @action(methods=["get"], detail=False)
+    @action(
+        methods=["get"], detail=False, permission_classes=[IsAuthenticated, ]
+    )
     def subscriptions(self, request):
         paginator = self.pagination_class()
         follow_objects = Follow.objects.filter(user=request.user)

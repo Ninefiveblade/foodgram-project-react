@@ -1,6 +1,7 @@
 """Users app models."""
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class FoodgramUser(AbstractUser):
@@ -52,9 +53,13 @@ class Follow(models.Model):
     def __str__(self) -> str:
         return f"На {self.author.username}, подписан {self.user.username}"
 
+    def clean(self):
+        if self.user == self.author:
+            raise ValidationError('Вы не можете подписаться сами на себя!')
+
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user', 'author'],
+            models.UniqueConstraint(fields=['user_id', 'author_id'],
                                     name='unique_follows')
         ]
         ordering = ["id"]

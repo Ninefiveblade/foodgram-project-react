@@ -1,10 +1,11 @@
 """Serializers module for api app."""
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.validators import ValidationError
 
 from users.models import Follow, FoodgramUser
 from cooking import models
+from .utils import get_additional_field
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -85,22 +86,13 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
             "last_name",
             "is_subscribed"
         )
-    def create(self, validated_data):
-        print(validated_data)
-        return super().create(validated_data)
 
     def get_is_subscribed(self, obj):
-        try:
-            user = self.context.get("request").user
-            if user.is_anonymous:
-                return False
-            return obj.following.filter(user=user).exists()
-        except Exception:
-            return False
+        return get_additional_field(self, obj.following)
 
 
-class FoodramRegisterInSerializer(serializers.ModelSerializer):
-    """Foodram Rerister input serializer."""
+class FoodramRegisterSerializer(serializers.ModelSerializer):
+    """Foodram Rerister serializer."""
 
     class Meta:
         model = FoodgramUser
@@ -112,20 +104,14 @@ class FoodramRegisterInSerializer(serializers.ModelSerializer):
             "last_name",
             "password"
         )
+        extra_kwargs = {
+            "password": {'write_only': True}
+        }
 
-
-class FoodgramRegisterOutSerializer(serializers.ModelSerializer):
-    """Foodram Rerister out serializer."""
-
-    class Meta:
-        model = FoodgramUser
-        fields = (
-            "email",
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-        )
+    def validate_username(self, username):
+        if not username.isalpha():
+            raise ValidationError('Имя должно иметь только буквы')
+        return username.lower()
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -187,28 +173,13 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         instance.ingredients.set(ingredient_list)
         instance.tags.set(tags)
-        instance.text = validated_data.get("text", instance.text)
-        instance.name = validated_data.get("name", instance.name)
-        instance.time = validated_data.get("time", instance.time)
-        instance.image = validated_data.get("image", instance.image)
-        instance.save()
-        return instance
-    
-    def validate(self, data):
-        print(data)
-        return super().validate(data)
+        return super().update(instance, validated_data)
 
     def get_is_favorited(self, obj):
-        user = self.context.get("request").user
-        if user.is_anonymous:
-            return False
-        return obj.favorite_recipe.filter(user=user).exists()
+        return get_additional_field(self, obj.favorite_recipe)
 
     def get_is_in_shopping_cart(self, obj):
-        user = self.context.get("request").user
-        if user.is_anonymous:
-            return False
-        return obj.shop_recipe.filter(user=user).exists()
+        return get_additional_field(self, obj.shop_recipe)
 
 
 class RecipeOutSerializer(RecipeSerializer):
@@ -231,6 +202,20 @@ class RecipeShortSerializer(serializers.ModelSerializer):
             "image",
             "cooking_time"
         )
+
+
+class FoodgramFollowInSerialier(serializers.Serializer):
+
+    class Meta:
+        model = Follow
+        fields = (
+            "author",
+            "user"
+        )
+
+    def create(self, validated_data):
+        print(validated_data)
+        return super().create(validated_data)
 
 
 class FoodgramFollowSerializer(serializers.Serializer):
@@ -261,16 +246,6 @@ class FoodgramFollowSerializer(serializers.Serializer):
             "recipes",
             "recipes_count"
         )
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=['author', 'user']
-            )
-        ]
-
-    def create(self, validated_data):
-        print(validated_data)
-        return Follow.objects.create(**validated_data)
 
     def get_recipes_count(self, obj):
         return obj.author.recipe_user.all().count()
@@ -285,4 +260,4 @@ class FoodgramFollowSerializer(serializers.Serializer):
         return RecipeShortSerializer(instance=obj, many=True).data
 
     def get_is_subscribed(self, obj):
-        return True
+        return get_additional_field(self, obj.following)
