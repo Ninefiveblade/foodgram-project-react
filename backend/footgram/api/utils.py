@@ -38,7 +38,7 @@ def check_delete(pk, model, user):
         )
     try:
         model.objects.get(recipe_id=recipe.id, user=user).delete()
-        return Response(status=204)
+        return Response(status=HTTPStatus.NO_CONTENT)
     except model.DoesNotExist:
         return Response(
             {"detail": "Страница не найдена."},
@@ -49,11 +49,6 @@ def check_delete(pk, model, user):
 def check_follow_create(pk, model, user):
     try:
         author = models.FoodgramUser.objects.get(id=pk)
-        if author == user:
-            return Response(
-                {"errors": "Вы не можете подписаться сами на себя!"},
-                HTTPStatus.BAD_REQUEST
-            )
         model.objects.create(user=user, author=author)
         return Response(status=HTTPStatus.NO_CONTENT)
     except IntegrityError:
@@ -92,7 +87,7 @@ def download(self, request):
     ).values(
         "ingredients__name",
         "ingredients__measurement"
-    ).annotate(amount=Sum('quantity'))
+    ).annotate(amount=Sum('quantity')).order_by("-total")
     filename = f"{user.username}_shopping_list.txt"
     shopping_list = ["Список покупок:"]
     for ingredient in ingredients:

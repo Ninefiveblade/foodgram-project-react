@@ -3,8 +3,8 @@ from rest_framework import mixins, viewsets
 from rest_framework.response import Response
 
 
-class PatchModelMixin(object):
-    """PATCH a model instance."""
+class PatchModelMixin:
+    """PATCH a model Recipes instance for PATCH update only."""
 
     def partial_update(self, request, *args, **kwargs):
         partial = True
@@ -31,8 +31,6 @@ class CustomListRetriveViewSet(
 ):
     """Custom mixin for GET request only."""
 
-    pass
-
 
 class RecipeMixin(
     mixins.CreateModelMixin,
@@ -43,5 +41,3 @@ class RecipeMixin(
     viewsets.GenericViewSet
 ):
     """Custom mixin where PUT is not included."""
-
-    pass

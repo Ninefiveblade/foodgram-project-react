@@ -6,6 +6,7 @@ from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from users.models import Follow
 from cooking import models
@@ -22,7 +23,6 @@ class RecipeViewSet(RecipeMixin):
     """Recipes viewsets."""
 
     pagination_class = ApiPagination
-    queryset = models.Recipe.objects.all()
     serializer_class = serializers.RecipeOutSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -75,7 +75,11 @@ class RecipeViewSet(RecipeMixin):
                 model=models.FavoriteRecipes
             )
 
-    @action(methods=["get"], detail=False)
+    @action(
+        methods=["get"],
+        detail=False,
+        permission_classes=[IsAuthenticated,]
+    )
     def download_shopping_cart(self, request):
         return download(self, request)
 
@@ -149,6 +153,8 @@ class FoodgramUserViewSet(UserViewSet):
     @action(methods=["post", "delete"], detail=True)
     def subscribe(self, request, id):
         if request.method == "POST":
+            serializer = serializers.FoodgramFollowSerializer(self.queryset)
+            print(serializer)
             return check_follow_create(pk=id, user=request.user, model=Follow)
         if request.method == "DELETE":
             return check_follow_delete(pk=id, user=request.user, model=Follow)

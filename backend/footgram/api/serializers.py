@@ -1,6 +1,7 @@
 """Serializers module for api app."""
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from users.models import Follow, FoodgramUser
 from cooking import models
@@ -70,7 +71,9 @@ class TagSerializer(serializers.ModelSerializer):
 class FoodgramUserSerializer(serializers.ModelSerializer):
     """FoodgramUser model serializer."""
 
-    is_subscribed = serializers.SerializerMethodField()
+    is_subscribed = serializers.SerializerMethodField(
+        method_name="get_is_subscribed"
+    )
 
     class Meta:
         model = FoodgramUser
@@ -82,12 +85,18 @@ class FoodgramUserSerializer(serializers.ModelSerializer):
             "last_name",
             "is_subscribed"
         )
+    def create(self, validated_data):
+        print(validated_data)
+        return super().create(validated_data)
 
     def get_is_subscribed(self, obj):
-        user = self.context.get("request").user
-        if user.is_anonymous:
+        try:
+            user = self.context.get("request").user
+            if user.is_anonymous:
+                return False
+            return obj.following.filter(user=user).exists()
+        except Exception:
             return False
-        return obj.following.filter(user=user).exists()
 
 
 class FoodramRegisterInSerializer(serializers.ModelSerializer):
@@ -184,6 +193,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.image = validated_data.get("image", instance.image)
         instance.save()
         return instance
+    
+    def validate(self, data):
+        print(data)
+        return super().validate(data)
 
     def get_is_favorited(self, obj):
         user = self.context.get("request").user
@@ -248,8 +261,15 @@ class FoodgramFollowSerializer(serializers.Serializer):
             "recipes",
             "recipes_count"
         )
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=['author', 'user']
+            )
+        ]
 
     def create(self, validated_data):
+        print(validated_data)
         return Follow.objects.create(**validated_data)
 
     def get_recipes_count(self, obj):

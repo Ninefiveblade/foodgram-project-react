@@ -2,6 +2,7 @@
 from colorfield.fields import ColorField
 from django.core.validators import MinValueValidator
 from django.db import models
+
 from users.models import FoodgramUser
 
 
@@ -39,12 +40,12 @@ class Recipe(models.Model):
         related_name="recipe_ingredients",
         blank=False
     )
-    time: int = models.IntegerField(
+    time: int = models.PositiveSmallIntegerField(
         verbose_name="Время приготовления в минутах",
         help_text="Введите время приготовления в минутах",
         validators=[
             MinValueValidator(1)
-        ]
+        ],
     )
     tags = models.ManyToManyField(
         "Tag",
@@ -192,7 +193,7 @@ class IngredientQuantity(models.Model):
         on_delete=models.CASCADE,
         blank=False,
     )
-    quantity: int = models.IntegerField(
+    quantity: int = models.PositiveSmallIntegerField(
         verbose_name="Количество ингридиента",
         help_text="Введите количество ингридиента",
         validators=[

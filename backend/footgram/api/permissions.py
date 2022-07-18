@@ -7,11 +7,9 @@ class RecipeIsStaffOrOwner(BasePermission):
     """
 
     def has_permission(self, request, view):
-        if view.action == "download_shopping_cart":
-            return request.user.is_authenticated
         return (
-            request.method in SAFE_METHODS
-            or request.user.is_authenticated
+            request.user.is_authenticated 
+            or request.method in SAFE_METHODS
         )
 
     def has_object_permission(self, request, view, obj):
