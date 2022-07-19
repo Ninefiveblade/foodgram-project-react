@@ -177,17 +177,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.tags.set(tags)
         return super().update(instance, validated_data)
 
-    def validate_ingredients(self, ingredients):
-        data = []
-        for ingredient in ingredients:
-            ingredient_id = ingredient.get('ingredients').id
-            if ingredient_id in data:
-                raise ValidationError(
-                    "Вы не можете добавить несколько одинаковых ингредиентов!"
-                )
-            data.append(ingredient_id)
-        return ingredients
-
     def validate_cooking_time(self, cooking_time):
         if cooking_time < 1:
             raise ValidationError("Время не может быть меньше 1 мин")
