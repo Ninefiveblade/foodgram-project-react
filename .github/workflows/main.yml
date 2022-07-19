@@ -63,6 +63,7 @@ jobs:
             sudo docker-compose stop
             sudo docker-compose rm backend
             sudo docker-compose rm frontend
+            sudo docker rm ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:v1
             sudo docker-compose up --build -d
             sudo docker-compose exec -T backend python manage.py makemigrations
             sudo docker-compose exec -T backend python manage.py migrate
