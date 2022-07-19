@@ -6,7 +6,7 @@ from cooking import models
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
-data = os.path.abspath("data")
+data = os.path.abspath("../data")
 
 
 class Command(BaseCommand):

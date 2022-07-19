@@ -40,7 +40,7 @@ class Recipe(models.Model):
         related_name="recipe_ingredients",
         blank=False
     )
-    time: int = models.PositiveSmallIntegerField(
+    time: int = models.IntegerField(
         verbose_name="Время приготовления в минутах",
         help_text="Введите время приготовления в минутах",
         validators=[
@@ -195,7 +195,7 @@ class IngredientQuantity(models.Model):
         on_delete=models.CASCADE,
         blank=False,
     )
-    quantity: int = models.PositiveSmallIntegerField(
+    quantity: int = models.IntegerField(
         verbose_name="Количество ингридиента",
         help_text="Введите количество ингридиента",
         validators=[

@@ -77,7 +77,7 @@ def download(self, request):
     ).values(
         "ingredients__name",
         "ingredients__measurement"
-    ).annotate(amount=Sum("quantity")).order_by("-total")
+    ).annotate(amount=Sum("quantity")).order_by("amount")
     filename = f"{user.username}_shopping_list.txt"
     shopping_list = ["Список покупок:"]
     for ingredient in ingredients:

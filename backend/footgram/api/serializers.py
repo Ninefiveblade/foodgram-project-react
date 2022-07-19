@@ -26,7 +26,7 @@ class IngredientAmountInSerializer(serializers.ModelSerializer):
     """IngredientQuantity models serializer."""
 
     id = serializers.PrimaryKeyRelatedField(
-        source='ingredients',
+        source="ingredients",
         queryset=models.Ingredient.objects.all()
     )
     amount = serializers.IntegerField(source="quantity")
