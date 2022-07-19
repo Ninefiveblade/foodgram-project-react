@@ -7,4 +7,4 @@ class ApiPagination(PageNumberPagination):
     """Custom pagination for all project
     """
     page_size = settings.PAGE_COUNTER
-    page_size_query_param = 'limit'
+    page_size_query_param = "limit"

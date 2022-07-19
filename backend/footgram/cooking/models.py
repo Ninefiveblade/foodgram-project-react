@@ -59,9 +59,9 @@ class Recipe(models.Model):
         return self.name
 
     class Meta:
-        ordering = ['-name']
-        verbose_name = 'Рецепт'
-        verbose_name_plural = 'Рецепты'
+        ordering = ["-name"]
+        verbose_name = "Рецепт"
+        verbose_name_plural = "Рецепты"
 
 
 class Tag(models.Model):
@@ -177,12 +177,12 @@ class ShopList(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['user_id', 'recipe_id'],
-                                    name='unique_shoplist')
+            models.UniqueConstraint(fields=["user_id", "recipe_id"],
+                                    name="unique_shoplist")
         ]
-        ordering = ['id']
-        verbose_name = 'Список покупок'
-        verbose_name_plural = 'Списки покупок'
+        ordering = ["id"]
+        verbose_name = "Список покупок"
+        verbose_name_plural = "Списки покупок"
 
 
 class IngredientQuantity(models.Model):
@@ -220,6 +220,6 @@ class IngredientQuantity(models.Model):
             models.UniqueConstraint(fields=["ingredients", "quantity"],
                                     name="unique_ingredients_quantity")
         ]
-        ordering = ['id']
-        verbose_name = 'Количество ингридиента'
-        verbose_name_plural = 'Количество ингридиентов'
+        ordering = ["id"]
+        verbose_name = "Количество ингридиента"
+        verbose_name_plural = "Количество ингридиентов"

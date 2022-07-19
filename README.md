@@ -31,6 +31,10 @@ DB_PORT=5432
 
 ```http://foodfound.myvnc.com/recipes```
 
+## Документация к проекту:
+
+```http://foodfound.myvnc.com/api/docs/``
+
 ## Запустить проект:
 
 ```your_path/infra/docker-compose up -d```
