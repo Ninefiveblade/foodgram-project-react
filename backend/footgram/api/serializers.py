@@ -38,6 +38,11 @@ class IngredientAmountInSerializer(serializers.ModelSerializer):
             "amount",
         )
 
+    def validate_amount(self, amount):
+        if amount < 1:
+            raise ValidationError('Количество не может быть меньше 1')
+        return amount
+
 
 class IngredientAmountOutSerializer(serializers.ModelSerializer):
     """IngredientQuantity model serializer for GET requests."""
@@ -171,6 +176,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.ingredients.set(ingredient_list)
         instance.tags.set(tags)
         return super().update(instance, validated_data)
+
+    def validate_cooking_time(self, cooking_time):
+        if cooking_time < 1:
+            raise ValidationError('Время не может быть меньше 1 мин')
+        return cooking_time
 
     def get_is_favorited(self, obj):
         return get_additional_field(self, obj.favorite_recipe)
