@@ -177,6 +177,17 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.tags.set(tags)
         return super().update(instance, validated_data)
 
+    def validate_ingredients(self, ingredients):
+        data = []
+        for ingredient in ingredients:
+            ingredient_id = ingredient.get('ingredients').id
+            if ingredient_id in data:
+                raise ValidationError(
+                    "Вы не можете добавить несколько одинаковых ингредиентов!"
+                )
+            data.append(ingredient_id)
+        return ingredients
+
     def validate_cooking_time(self, cooking_time):
         if cooking_time < 1:
             raise ValidationError("Время не может быть меньше 1 мин")
@@ -244,13 +255,14 @@ class FoodgramFollowSerializer(serializers.Serializer):
         return obj.author.recipe_user.all().count()
 
     def get_recipes(self, obj):
+        recipes = obj.author.recipe_user.all()
         recipe_limit = self.context.get(
             "request"
         ).query_params.get("recipes_limit")
         if recipe_limit is not None:
             recipes = obj.author.recipe_user.all()[:int(recipe_limit)]
             return RecipeShortSerializer(instance=recipes, many=True).data
-        return RecipeShortSerializer(instance=obj, many=True).data
+        return RecipeShortSerializer(instance=recipes, many=True).data
 
     def get_is_subscribed(self, obj):
-        return get_additional_field(self, obj.following)
+        return True
