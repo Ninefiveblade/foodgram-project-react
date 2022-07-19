@@ -33,7 +33,7 @@ DB_PORT=5432
 
 ## Документация к проекту:
 
-```http://foodfound.myvnc.com/api/docs/``
+```http://foodfound.myvnc.com/api/docs/```
 
 ## Запустить проект:
 
