@@ -15,9 +15,9 @@ load_dotenv()
 SECRET_KEY = os.getenv('SECRET_KEY') or get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(' ')
 
 
 # Application definition
