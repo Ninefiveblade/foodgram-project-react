@@ -2,6 +2,9 @@ version: '3.3'
 services:
   db:
     image: postgres:13.0-alpine
+    environment:
+        TZ: "Europe/Moscow"
+        PGTZ: "Europe/Moscow"
     volumes:
       - /var/lib/postgresql/data/
     env_file:
