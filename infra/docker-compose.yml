@@ -4,6 +4,9 @@ services:
     image: postgres:13.0-alpine
     volumes:
       - /var/lib/postgresql/data/
+    environment:
+        TZ: "Europe/Moscow"
+        PGTZ: "Europe/Moscow"
     env_file:
       - ./.env
   frontend:
