@@ -173,7 +173,6 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
             )
             ingredient_list.append(ingredient)
-        instance.image = validated_data.get("image", instance.image)
         instance.ingredients.set(ingredient_list)
         instance.tags.set(tags)
         return super().update(instance, validated_data)
