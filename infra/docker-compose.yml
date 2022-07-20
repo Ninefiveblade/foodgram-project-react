@@ -4,9 +4,6 @@ services:
     image: postgres:13.0-alpine
     volumes:
       - /var/lib/postgresql/data/
-    environment:
-        TZ: "Europe/Moscow"
-        PGTZ: "Europe/Moscow"
     env_file:
       - ./.env
   frontend:
@@ -16,9 +13,9 @@ services:
     depends_on:
       - backend
   backend:
-    image: ninefiveblade/foodgram_backend:v1
+    image: 
     restart: always
-    volumes:
+    volumes: ninefiveblade/foodgram_backend:v1
       - static_value:/app/footgram/static_django/
       - media_value:/app/footgram/media/
     depends_on:
