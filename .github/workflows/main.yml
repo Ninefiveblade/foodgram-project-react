@@ -61,6 +61,7 @@ jobs:
           script: |
             cd project/
             sudo docker-compose stop
+            sudo docker-compose run --rm certbot renew
             sudo docker-compose rm backend
             sudo docker rm ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:v1
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:v1
