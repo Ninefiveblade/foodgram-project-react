@@ -30,7 +30,7 @@ class Recipe(models.Model):
     text: str = models.TextField(
         verbose_name="Описание рецепта",
         help_text="Введите описание рецепта",
-
+        blank=False
     )
     pub_date = models.DateTimeField(auto_now_add=True)
     ingredients = models.ManyToManyField(
