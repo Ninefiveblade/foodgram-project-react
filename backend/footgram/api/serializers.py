@@ -177,20 +177,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.tags.set(tags)
         return super().update(instance, validated_data)
 
-    def validate_name(self, name):
-        if name < 5:
-            raise ValidationError("Название не может быть меньше 5 символов!")
-        if name.isalnum():
-            raise ValidationError(
-                "Название должно содержать только буквы без цифр!"
-            )
-        return name
-
-    def validate_text(self, text):
-        if text < 20:
-            raise ValidationError("Описание не может быть меньше 20 символов!")
-        return text
-
     def validate_cooking_time(self, cooking_time):
         if cooking_time < 1:
             raise ValidationError("Время не может быть меньше 1 мин.")
