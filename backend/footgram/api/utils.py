@@ -31,12 +31,16 @@ def check_delete(pk, model, user):
     return Response(status=HTTPStatus.NO_CONTENT)
 
 
-def check_follow_create(pk, model, user):
+def check_follow_create(pk, model, user, request):
     """Create follow optimization."""
     try:
         author = get_object_or_404(models.FoodgramUser, id=pk)
-        model.objects.create(user=user, author=author)
-        return Response(status=HTTPStatus.NO_CONTENT)
+        follow = model.objects.create(user=user, author=author)
+        serializer = serializers.FoodgramFollowSerializer(
+            follow,
+            context={"request": request}
+        )
+        return Response(serializer.data, status=HTTPStatus.CREATED)
     except IntegrityError:
         return Response(
             {"errors": ("Вы не можете подписаться на "

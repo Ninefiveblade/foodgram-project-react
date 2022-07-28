@@ -150,7 +150,9 @@ class FoodgramUserViewSet(UserViewSet):
     @action(methods=["post", "delete"], detail=True)
     def subscribe(self, request, id):
         if request.method == "POST":
-            return check_follow_create(pk=id, user=request.user, model=Follow)
+            return check_follow_create(
+                pk=id, user=request.user, model=Follow, request=request
+            )
         return check_follow_delete(pk=id, user=request.user, model=Follow)
 
     @action(
