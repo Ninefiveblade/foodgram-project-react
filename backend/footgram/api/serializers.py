@@ -1,11 +1,12 @@
 """Serializers module for api app."""
 from drf_extra_fields.fields import Base64ImageField
+from django.conf import settings
 from rest_framework import serializers
 from rest_framework.validators import ValidationError
 
 from users.models import Follow, FoodgramUser
 from cooking import models
-from .utils import get_additional_field
+from .utils import get_additional_field, validate
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -116,6 +117,10 @@ class FoodramRegisterSerializer(serializers.ModelSerializer):
     def validate_username(self, username):
         if not username.isalpha():
             raise ValidationError('Имя должно иметь только буквы!')
+        if len(username) < settings.MIN_LEN_USERNAME:
+            raise ValidationError(
+                'Username не может быть меньше 5 символов!'
+            )
         return username.lower()
 
 
@@ -176,6 +181,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         instance.ingredients.set(ingredient_list)
         instance.tags.set(tags)
         return super().update(instance, validated_data)
+
+    def validate_name(self, name):
+        return validate(
+            name,
+            settings.MIN_LEN_NAME,
+            settings.MAX_LEN_NAME
+        )
 
     def validate_cooking_time(self, cooking_time):
         if cooking_time < 1:

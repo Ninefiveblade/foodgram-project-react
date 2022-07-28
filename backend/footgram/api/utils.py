@@ -6,6 +6,7 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.validators import ValidationError
 
 from cooking import models
 from . import serializers
@@ -71,6 +72,19 @@ def get_additional_field(self, obj_related):
         return obj_related.filter(user=user).exists()
     except Exception:
         return False
+
+
+def validate(var, len_min, len_max):
+    if (
+        len(var) < len_min
+        or len(var) > len_max
+    ):
+        raise ValidationError(
+            f"В названии рецепта длина допустима от "
+            f"{len_min} "
+            f"до {len_max}"
+        )
+    return var
 
 
 def download(self, request):

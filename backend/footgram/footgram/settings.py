@@ -152,3 +152,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_django/")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 PAGE_COUNTER = 6
+
+MIN_LEN_NAME = 4
+MAX_LEN_NAME = 30
+MIN_LEN_USERNAME = 5
